@@ -31,6 +31,7 @@ const gameLoop = (function(){
     let numberOfTurns = 0;
     let whoseTurn = 1;
     let player = {};
+    let computer = {};
 
     const getNumberOfTurns = () => numberOfTurns;
 
@@ -38,10 +39,12 @@ const gameLoop = (function(){
 
     const newGame = function() {
         player = createPlayer('X');
-        computer = createPlayer('O');
+        computer = createComputer('O');
     }
 
     const nextTurn = function() {
+        updateBoard();
+
         if(whoseTurn) { 
             whoseTurn = 0;
             makePlayerMove();
@@ -52,7 +55,11 @@ const gameLoop = (function(){
     }
 
     const makeComputerMove = function() {
-        console.log('I dont have a brain yet');
+
+        console.log(computer.calculateMove());
+        
+        // gameBoard.makeMove(computer.getToken, randomRow, randomColumn);
+        
     }
 
     const makePlayerMove = function() {
@@ -62,12 +69,11 @@ const gameLoop = (function(){
         if(gameBoard.isMoveLegal(playerMoveRow, playerMoveColumn)){
             gameBoard.makeMove(player.getToken(), playerMoveRow, playerMoveColumn);
         }
-
-        updateBoard();
         nextTurn();
     }
 
     const updateBoard = function(){
+        console.clear();
         console.table(gameBoard.getGameBoard());
     }
 
@@ -86,3 +92,43 @@ function createPlayer(token){
 
     return { getToken }
 }
+
+function createComputer(token){
+    const { getToken } = createPlayer(token);
+
+    const calculateMove = function(){
+
+        let computerMove = [];
+
+         //Always aim for the center in the beginning.
+         if(gameBoard.getGameBoard()[1][1]==='') {
+            computerMove = [1,1];
+            return computerMove
+        }
+
+        const generateRandomMove = function(){
+    
+            const generateNewMove = function(){
+                const row = getRandomInt(gameBoard.getGameBoard().length);
+                const column = getRandomInt(gameBoard.getGameBoard()[row].length);
+                const isLegalMove = gameBoard.isMoveLegal(row, column);
+                return { row, column, isLegalMove} 
+            }
+    
+            do{
+                computerMove = generateNewMove();
+            } while (!computerMove.isLegalMove);
+    
+            return computerMove
+        }
+
+        return generateRandomMove();
+    }
+
+    return{ calculateMove, getToken }
+
+}
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+  }
