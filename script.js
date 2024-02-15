@@ -51,9 +51,6 @@ const gameBoard = (function(){
         return isWinningMove;
     }
 
-    
-       
-
     const showWinningTiles = function(){
 
     }
@@ -63,15 +60,11 @@ const gameBoard = (function(){
 
 const gameLoop = (function(){
 
-    const MAX_NUMBER_OF_TURNS = gameBoard.getNumberOfTiles;
+    const MAX_NUMBER_OF_TURNS = gameBoard.getNumberOfTiles();
     let numberOfTurns = 0;
     let whoseTurn = 1;
     let player = {};
     let computer = {};
-
-    const getNumberOfTurns = () => numberOfTurns;
-
-    const increaseNumberOfTurns = () => numberOfTurns ++;
 
     const newGame = function() {
         player = createPlayer('X');
@@ -80,8 +73,19 @@ const gameLoop = (function(){
 
     const nextTurn = function() {
         updateBoard();
-        console.log('validate move: ' + gameBoard.validateMove())
-        if(gameBoard.validateMove()) win();
+        
+        //check for wins
+        if(gameBoard.validateMove()) {
+            win();
+            return
+        }
+        //check for ties
+        if(numberOfTurns === MAX_NUMBER_OF_TURNS) {
+            tie();
+            return
+        }
+
+        numberOfTurns ++;
 
         if(whoseTurn) { 
             whoseTurn = 0;
@@ -112,10 +116,15 @@ const gameLoop = (function(){
     const updateBoard = function(){
         console.clear();
         console.table(gameBoard.getGameBoard());
+        console.log(numberOfTurns);
     }
 
     const win = function() {
         console.log('someone won!');
+    }
+
+    const tie = function(){
+        console.log('TIE');
     }
     
     newGame();
