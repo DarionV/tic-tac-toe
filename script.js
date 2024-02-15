@@ -3,6 +3,10 @@ const gameBoard = (function(){
 
     const getGameBoard = () => gameBoardArray;
 
+    const addTileToGameBoard = function(tile, row, column) {
+        gameBoardArray[row][column] = tile;
+    }
+
     const getGameBoardContainer = () => document.querySelector('.js-gameboard-container');
 
     const getNumberOfTiles = () => Math.pow(gameBoardArray.length, 2);
@@ -16,20 +20,22 @@ const gameBoard = (function(){
     const getToken = () => token;
 
     const isMoveLegal = function(row, column){
-        return gameBoardArray[row][column] === '';
+        return gameBoardArray[row][column].getValue() === '';
     }
 
     const makeMove = function(row, column){
-        gameBoardArray[row][column] = token;
+        gameBoardArray[row][column].setValue(token);
+
     }
 
     const validateMove = function(){
 
         let isWinningMove = false;
+        
 
         // 1) check rows for winner
         gameBoardArray.forEach((row) => {
-            if(row[0]!== '') {
+            if(row[0].getValue()!== '') {
                 if(allEqual(row)) isWinningMove = true;
             }
         })
@@ -41,16 +47,16 @@ const gameBoard = (function(){
             gameBoardArray.forEach((row)=>{
                 column.push(row[i]);
             })
-            if(column[0] !== '') {
+            if(column[0].getValue() !== '') {
                 if(allEqual(column)) isWinningMove = true;
             }
         }
 
-        // 3) check diagonals for winner
+        // // 3) check diagonals for winner
         const firstDiagonal = [gameBoardArray[0][0], gameBoardArray[1][1], gameBoardArray[2][2]];
         const secondDiagonal = [gameBoardArray[0][2], gameBoardArray[1][1], gameBoardArray[2][0]];
         
-        if (firstDiagonal[1] !== ''){
+        if (firstDiagonal[1].getValue() !== ''){
             if(allEqual(firstDiagonal) || allEqual(secondDiagonal)) isWinningMove = true;
         }
 
@@ -61,7 +67,8 @@ const gameBoard = (function(){
 
     }
 
-    return { getGameBoard,getGameBoardContainer, resetBoard, isMoveLegal, makeMove, validateMove, showWinningTiles, getNumberOfTiles, setToken, getToken}
+    return { getGameBoard,getGameBoardContainer, resetBoard, isMoveLegal, 
+        makeMove, validateMove, showWinningTiles, getNumberOfTiles, setToken, getToken, addTileToGameBoard}
 })();
 
 const gameLoop = (function(){
@@ -130,7 +137,6 @@ const gameLoop = (function(){
     }
     
     newGame();
-    nextTurn();
 
     return { nextTurn }
 
@@ -145,13 +151,13 @@ const displayController = (function(){
         for(let row = 0; row < gameBoardLength; row ++){
             for(let column = 0; column < gameBoardLength; column ++){
                 const newTile = createTile(row, column);
+                gameBoard.addTileToGameBoard(newTile, row, column);
 
                 newTile.getTile().addEventListener('click', ()=>{
 
                     if(gameBoard.isMoveLegal(row, column)) {
                         gameBoard.makeMove(row, column);
                         updateBoard();
-                        newTile.setValue(gameBoard.getToken());
                         gameLoop.nextTurn();
                     }
                    
@@ -162,8 +168,8 @@ const displayController = (function(){
     })();
 
     const updateBoard = function(){
-        console.clear();
-        console.table(gameBoard.getGameBoard());
+        // console.clear();
+        // console.table(gameBoard.getGameBoard());
     }
 
     updateBoard();
@@ -200,7 +206,7 @@ function createComputer(token){
         let computerMove = {};
 
          // 1) Always aim for the center in the beginning.
-         if(gameBoard.getGameBoard()[1][1]==='') {
+         if(gameBoard.getGameBoard()[1][1].getValue() === '') {
             gameBoard.makeMove(1, 1);
             displayController.updateBoard();
             gameLoop.nextTurn();
@@ -236,6 +242,6 @@ function getRandomInt(max) {
 
 function allEqual(array){
     return array.every(function(element){
-        return element === array[0];
+        return element.getValue() === array[0].getValue();
     });
 }
