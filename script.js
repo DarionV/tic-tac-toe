@@ -3,6 +3,8 @@ const gameBoard = (function(){
 
     const getGameBoard = () => gameBoardArray;
 
+    const getGameBoardContainer = () => document.querySelector('.js-gameboard-container');
+
     const getNumberOfTiles = () => Math.pow(gameBoardArray.length, 2);
 
     const resetBoard = function() {
@@ -55,7 +57,30 @@ const gameBoard = (function(){
 
     }
 
-    return { getGameBoard, resetBoard, isMoveLegal, makeMove, validateMove, showWinningTiles, getNumberOfTiles }
+    return { getGameBoard,getGameBoardContainer, resetBoard, isMoveLegal, makeMove, validateMove, showWinningTiles, getNumberOfTiles }
+})();
+
+const displayController = (function(){
+    const updateBoard = function(){
+        console.clear();
+        console.table(gameBoard.getGameBoard());
+    }
+
+    const createTiles = function(){
+        const container = gameBoard.getGameBoardContainer();
+        const gameBoardLength = gameBoard.getGameBoard().length;
+
+        for(let row = 0; row < gameBoardLength; row ++){
+            for(let column = 0; column < gameBoardLength; column ++){
+                const newTile = createTile(row, column);
+                newTile.getTile().addEventListener('click', newTile.makeMove);
+                container.appendChild(newTile.getTile());  
+            }
+        }
+    }
+
+    createTiles();
+    return { updateBoard }
 })();
 
 const gameLoop = (function(){
@@ -72,7 +97,7 @@ const gameLoop = (function(){
     }
 
     const nextTurn = function() {
-        updateBoard();
+        displayController.updateBoard();
 
         //check for wins
         if(gameBoard.validateMove()) {
@@ -103,20 +128,14 @@ const gameLoop = (function(){
     }
 
     const makePlayerMove = function() {
-        let playerMoveRow = prompt('Row?') - 1;
-        let playerMoveColumn = prompt('Column?') - 1;
+        // let playerMoveRow = prompt('Row?') - 1;
+        // let playerMoveColumn = prompt('Column?') - 1;
 
         if(gameBoard.isMoveLegal(playerMoveRow, playerMoveColumn)) 
             gameBoard.makeMove(player.getToken(), playerMoveRow, playerMoveColumn);
          else makePlayerMove();
 
         nextTurn();
-    }
-
-    const updateBoard = function(){
-        console.clear();
-        console.table(gameBoard.getGameBoard());
-        console.log(numberOfTurns);
     }
 
     const win = function() {
@@ -131,6 +150,21 @@ const gameLoop = (function(){
     // nextTurn();
 
 })();
+
+function createTile(row, column){
+    const tile = document.createElement('div');
+    tile.classList.add('tile');
+
+    const getTile = () => tile;
+    const getRow  = () => row;
+    const getColumn = () => column;
+
+    const makeMove = function(){
+        gameBoard.makeMove(row, column);
+    }
+
+    return { getTile, getRow, getColumn, makeMove }
+}
 
 function createPlayer(token){
 
