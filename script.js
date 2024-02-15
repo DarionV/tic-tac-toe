@@ -3,6 +3,8 @@ const gameBoard = (function(){
 
     const getGameBoard = () => gameBoardArray;
 
+    const getNumberOfTiles = () => Math.pow(gameBoardArray.length, 2);
+
     const resetBoard = function() {
 
     }
@@ -16,18 +18,52 @@ const gameBoard = (function(){
     }
 
     const validateMove = function(){
+
+        let isWinningMove = false;
+
+        // 1) check rows for winner
+        gameBoardArray.forEach((row) => {
+            if(row[0]!== '') {
+                if(allEqual(row)) isWinningMove = true;
+            }
+        })
+
+        // 2) check columns for winner
+        for(let i = 0; i < gameBoardArray.length; i ++){
+            let column = [];
+            
+            gameBoardArray.forEach((row)=>{
+                column.push(row[i]);
+            })
+            if(column[0] !== '') {
+                if(allEqual(column)) isWinningMove = true;
+            }
+        }
+
+        // 3) check diagonals for winner
+        const firstDiagonal = [gameBoardArray[0][0], gameBoardArray[1][1], gameBoardArray[2][2]];
+        const secondDiagonal = [gameBoardArray[0][2], gameBoardArray[1][1], gameBoardArray[2][0]];
         
+        if (firstDiagonal[1] !== ''){
+            if(allEqual(firstDiagonal) || allEqual(secondDiagonal)) isWinningMove = true;
+        }
+
+        return isWinningMove;
     }
+
+    
+       
 
     const showWinningTiles = function(){
 
     }
 
-    return { getGameBoard, resetBoard, isMoveLegal, makeMove, validateMove, showWinningTiles }
+    return { getGameBoard, resetBoard, isMoveLegal, makeMove, validateMove, showWinningTiles, getNumberOfTiles }
 })();
 
 const gameLoop = (function(){
 
+    const MAX_NUMBER_OF_TURNS = gameBoard.getNumberOfTiles;
     let numberOfTurns = 0;
     let whoseTurn = 1;
     let player = {};
@@ -44,6 +80,8 @@ const gameLoop = (function(){
 
     const nextTurn = function() {
         updateBoard();
+        console.log('validate move: ' + gameBoard.validateMove())
+        if(gameBoard.validateMove()) win();
 
         if(whoseTurn) { 
             whoseTurn = 0;
@@ -55,20 +93,19 @@ const gameLoop = (function(){
     }
 
     const makeComputerMove = function() {
-
-        console.log(computer.calculateMove());
-        
-        // gameBoard.makeMove(computer.getToken, randomRow, randomColumn);
-        
+        const computerMove = computer.calculateMove();
+        gameBoard.makeMove(computer.getToken(), computerMove.row, computerMove.column);
+        nextTurn();        
     }
 
     const makePlayerMove = function() {
         let playerMoveRow = prompt('Row?') - 1;
         let playerMoveColumn = prompt('Column?') - 1;
 
-        if(gameBoard.isMoveLegal(playerMoveRow, playerMoveColumn)){
+        if(gameBoard.isMoveLegal(playerMoveRow, playerMoveColumn)) 
             gameBoard.makeMove(player.getToken(), playerMoveRow, playerMoveColumn);
-        }
+         else makePlayerMove();
+
         nextTurn();
     }
 
@@ -78,7 +115,7 @@ const gameLoop = (function(){
     }
 
     const win = function() {
-
+        console.log('someone won!');
     }
     
     newGame();
@@ -98,14 +135,16 @@ function createComputer(token){
 
     const calculateMove = function(){
 
-        let computerMove = [];
+        let computerMove = {};
 
-         //Always aim for the center in the beginning.
+         // 1) Always aim for the center in the beginning.
          if(gameBoard.getGameBoard()[1][1]==='') {
-            computerMove = [1,1];
+            computerMove.row = 1;
+            computerMove.column = 1;
             return computerMove
         }
 
+        // 2) If center is taken, make a random move.
         const generateRandomMove = function(){
     
             const generateNewMove = function(){
@@ -118,7 +157,6 @@ function createComputer(token){
             do{
                 computerMove = generateNewMove();
             } while (!computerMove.isLegalMove);
-    
             return computerMove
         }
 
@@ -132,3 +170,9 @@ function createComputer(token){
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
   }
+
+function allEqual(array){
+    return array.every(function(element){
+        return element === array[0];
+    });
+}
