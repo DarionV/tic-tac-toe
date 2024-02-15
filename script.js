@@ -28,15 +28,23 @@ const gameBoard = (function(){
 
     }
 
+    let winningTiles = [];
+
+    const getWinningTiles = () => winningTiles;
+
     const validateMove = function(){
 
         let isWinningMove = false;
+        
         
 
         // 1) check rows for winner
         gameBoardArray.forEach((row) => {
             if(row[0].getValue()!== '') {
-                if(allEqual(row)) isWinningMove = true;
+                if(allEqual(row)) {
+                    isWinningMove = true;
+                    winningTiles = row;
+                }
             }
         })
 
@@ -48,7 +56,10 @@ const gameBoard = (function(){
                 column.push(row[i]);
             })
             if(column[0].getValue() !== '') {
-                if(allEqual(column)) isWinningMove = true;
+                if(allEqual(column)) {
+                    isWinningMove = true;
+                    winningTiles = column;
+                }
             }
         }
 
@@ -57,7 +68,14 @@ const gameBoard = (function(){
         const secondDiagonal = [gameBoardArray[0][2], gameBoardArray[1][1], gameBoardArray[2][0]];
         
         if (firstDiagonal[1].getValue() !== ''){
-            if(allEqual(firstDiagonal) || allEqual(secondDiagonal)) isWinningMove = true;
+            if(allEqual(firstDiagonal)) {
+                isWinningMove = true;
+                winningTiles = firstDiagonal;
+            }
+            if(allEqual(secondDiagonal)) {
+                isWinningMove = true;
+                winningTiles = secondDiagonal;
+            }
         }
 
         return isWinningMove;
@@ -68,8 +86,27 @@ const gameBoard = (function(){
     }
 
     return { getGameBoard,getGameBoardContainer, resetBoard, isMoveLegal, 
-        makeMove, validateMove, showWinningTiles, getNumberOfTiles, setToken, getToken, addTileToGameBoard}
+        makeMove, validateMove, showWinningTiles, getNumberOfTiles, setToken, getToken, addTileToGameBoard, getWinningTiles}
 })();
+
+const displayController = (function(){
+    
+    const createTiles = (function(){
+        const container = gameBoard.getGameBoardContainer();
+        const gameBoardLength = gameBoard.getGameBoard().length;
+
+        for(let row = 0; row < gameBoardLength; row ++){
+            for(let column = 0; column < gameBoardLength; column ++){
+                const newTile = createTile(row, column);
+                gameBoard.addTileToGameBoard(newTile, row, column);
+                container.appendChild(newTile.getTile());  
+            }
+        }
+    })();
+
+
+})();
+
 
 const gameLoop = (function(){
 
@@ -88,7 +125,7 @@ const gameLoop = (function(){
 
         //check for wins
         if(gameBoard.validateMove()) {
-            win();
+            win(gameBoard.validateMove());
             return
         }
         //check for ties
@@ -101,7 +138,6 @@ const gameLoop = (function(){
 
         if(whoseTurn) { 
             whoseTurn = 0;
-            makePlayerMove();
             gameBoard.setToken(player.getToken());
         } else {
             whoseTurn = 1;
@@ -111,25 +147,24 @@ const gameLoop = (function(){
     }
 
     const makeComputerMove = function() {
-        computer.calculateMove();
-        // const computerMove = computer.calculateMove();
-        // gameBoard.makeMove(computerMove.row, computerMove.column);
-        // nextTurn();        
-    }
-
-    const makePlayerMove = function() {
-        // let playerMoveRow = prompt('Row?') - 1;
-        // let playerMoveColumn = prompt('Column?') - 1;
-
-        // if(gameBoard.isMoveLegal(playerMoveRow, playerMoveColumn)) 
-        //     gameBoard.makeMove(player.getToken(), playerMoveRow, playerMoveColumn);
-        //  else makePlayerMove();
-
-        // nextTurn();
+        computer.calculateMove();      
     }
 
     const win = function() {
-        console.log('someone won!');
+        console.log(gameBoard.getToken() + ' won!');
+        gameBoard.getWinningTiles().forEach((e)=>{
+            e.getTile().classList.add('locked');
+        });
+
+        gameBoard.getGameBoard().forEach((row)=>{
+            row.forEach((e)=>{
+                if(!e.getTile().classList.contains('locked')){
+                    e.setValue('');
+                }
+                e.getTile().classList.remove('locked');
+            })
+        })
+        
     }
 
     const tie = function(){
@@ -142,41 +177,6 @@ const gameLoop = (function(){
 
 })();
 
-const displayController = (function(){
-    
-    const createTiles = (function(){
-        const container = gameBoard.getGameBoardContainer();
-        const gameBoardLength = gameBoard.getGameBoard().length;
-
-        for(let row = 0; row < gameBoardLength; row ++){
-            for(let column = 0; column < gameBoardLength; column ++){
-                const newTile = createTile(row, column);
-                gameBoard.addTileToGameBoard(newTile, row, column);
-
-                newTile.getTile().addEventListener('click', ()=>{
-
-                    if(gameBoard.isMoveLegal(row, column)) {
-                        gameBoard.makeMove(row, column);
-                        updateBoard();
-                        gameLoop.nextTurn();
-                    }
-                   
-                });
-                container.appendChild(newTile.getTile());  
-            }
-        }
-    })();
-
-    const updateBoard = function(){
-        // console.clear();
-        // console.table(gameBoard.getGameBoard());
-    }
-
-    updateBoard();
-
-    return { updateBoard }
-
-})();
 
 function createTile(row, column){
     const tile = document.createElement('div');
@@ -185,8 +185,19 @@ function createTile(row, column){
     const getTile = () => tile;
     const getRow  = () => row;
     const getColumn = () => column;
-    const getValue= () => tile.textContent;
-    const setValue = (value) => tile.textContent = value;
+    const getValue= () => tile.textContent; 
+    const setValue = (value) => tile.textContent = value; //Make tile flip here later...
+
+    tile.addEventListener('click', ()=>{
+
+        if(gameBoard.isMoveLegal(row, column)) {
+            gameBoard.makeMove(row, column);
+            gameLoop.nextTurn();
+        }
+       
+    });
+
+    
 
     return { getTile, getRow, getColumn, getValue, setValue }
 }
@@ -208,7 +219,6 @@ function createComputer(token){
          // 1) Always aim for the center in the beginning.
          if(gameBoard.getGameBoard()[1][1].getValue() === '') {
             gameBoard.makeMove(1, 1);
-            displayController.updateBoard();
             gameLoop.nextTurn();
             return;
         }
@@ -227,7 +237,6 @@ function createComputer(token){
         } while (!computerMove.isLegalMove);
 
         gameBoard.makeMove(computerMove.row, computerMove.column);
-        displayController.updateBoard();
         gameLoop.nextTurn();
 
     }
