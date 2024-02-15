@@ -27,4 +27,8 @@ body{
     background-color: #EFEFEF;
     border-radius: 12px;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 50px;
 }

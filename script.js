@@ -13,6 +13,8 @@ const gameBoard = (function(){
 
     const setToken = (value) => token = value;
 
+    const getToken = () => token;
+
     const isMoveLegal = function(row, column){
         return gameBoardArray[row][column] === '';
     }
@@ -59,7 +61,7 @@ const gameBoard = (function(){
 
     }
 
-    return { getGameBoard,getGameBoardContainer, resetBoard, isMoveLegal, makeMove, validateMove, showWinningTiles, getNumberOfTiles, setToken}
+    return { getGameBoard,getGameBoardContainer, resetBoard, isMoveLegal, makeMove, validateMove, showWinningTiles, getNumberOfTiles, setToken, getToken}
 })();
 
 const gameLoop = (function(){
@@ -149,6 +151,7 @@ const displayController = (function(){
                     if(gameBoard.isMoveLegal(row, column)) {
                         gameBoard.makeMove(row, column);
                         updateBoard();
+                        newTile.setValue(gameBoard.getToken());
                         gameLoop.nextTurn();
                     }
                    
@@ -176,8 +179,10 @@ function createTile(row, column){
     const getTile = () => tile;
     const getRow  = () => row;
     const getColumn = () => column;
+    const getValue= () => tile.textContent;
+    const setValue = (value) => tile.textContent = value;
 
-    return { getTile, getRow, getColumn }
+    return { getTile, getRow, getColumn, getValue, setValue }
 }
 
 function createPlayer(token){
@@ -222,7 +227,7 @@ function createComputer(token){
     }
 
     return{ calculateMove, getToken }
-
+g
 }
 
 function getRandomInt(max) {
