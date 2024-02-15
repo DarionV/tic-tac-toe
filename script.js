@@ -7,15 +7,17 @@ const gameBoard = (function(){
 
     const getNumberOfTiles = () => Math.pow(gameBoardArray.length, 2);
 
-    const resetBoard = function() {
+    const resetBoard = function() {}
 
-    }
+    let token = '';
+
+    const setToken = (value) => token = value;
 
     const isMoveLegal = function(row, column){
         return gameBoardArray[row][column] === '';
     }
 
-    const makeMove = function(token, row, column){
+    const makeMove = function(row, column){
         gameBoardArray[row][column] = token;
     }
 
@@ -57,30 +59,7 @@ const gameBoard = (function(){
 
     }
 
-    return { getGameBoard,getGameBoardContainer, resetBoard, isMoveLegal, makeMove, validateMove, showWinningTiles, getNumberOfTiles }
-})();
-
-const displayController = (function(){
-    const updateBoard = function(){
-        console.clear();
-        console.table(gameBoard.getGameBoard());
-    }
-
-    const createTiles = function(){
-        const container = gameBoard.getGameBoardContainer();
-        const gameBoardLength = gameBoard.getGameBoard().length;
-
-        for(let row = 0; row < gameBoardLength; row ++){
-            for(let column = 0; column < gameBoardLength; column ++){
-                const newTile = createTile(row, column);
-                newTile.getTile().addEventListener('click', newTile.makeMove);
-                container.appendChild(newTile.getTile());  
-            }
-        }
-    }
-
-    createTiles();
-    return { updateBoard }
+    return { getGameBoard,getGameBoardContainer, resetBoard, isMoveLegal, makeMove, validateMove, showWinningTiles, getNumberOfTiles, setToken}
 })();
 
 const gameLoop = (function(){
@@ -97,7 +76,6 @@ const gameLoop = (function(){
     }
 
     const nextTurn = function() {
-        displayController.updateBoard();
 
         //check for wins
         if(gameBoard.validateMove()) {
@@ -115,27 +93,30 @@ const gameLoop = (function(){
         if(whoseTurn) { 
             whoseTurn = 0;
             makePlayerMove();
+            gameBoard.setToken(player.getToken());
         } else {
             whoseTurn = 1;
+            gameBoard.setToken(computer.getToken());
             makeComputerMove();
         }
     }
 
     const makeComputerMove = function() {
-        const computerMove = computer.calculateMove();
-        gameBoard.makeMove(computer.getToken(), computerMove.row, computerMove.column);
-        nextTurn();        
+        computer.calculateMove();
+        // const computerMove = computer.calculateMove();
+        // gameBoard.makeMove(computerMove.row, computerMove.column);
+        // nextTurn();        
     }
 
     const makePlayerMove = function() {
         // let playerMoveRow = prompt('Row?') - 1;
         // let playerMoveColumn = prompt('Column?') - 1;
 
-        if(gameBoard.isMoveLegal(playerMoveRow, playerMoveColumn)) 
-            gameBoard.makeMove(player.getToken(), playerMoveRow, playerMoveColumn);
-         else makePlayerMove();
+        // if(gameBoard.isMoveLegal(playerMoveRow, playerMoveColumn)) 
+        //     gameBoard.makeMove(player.getToken(), playerMoveRow, playerMoveColumn);
+        //  else makePlayerMove();
 
-        nextTurn();
+        // nextTurn();
     }
 
     const win = function() {
@@ -147,7 +128,44 @@ const gameLoop = (function(){
     }
     
     newGame();
-    // nextTurn();
+    nextTurn();
+
+    return { nextTurn }
+
+})();
+
+const displayController = (function(){
+    
+    const createTiles = (function(){
+        const container = gameBoard.getGameBoardContainer();
+        const gameBoardLength = gameBoard.getGameBoard().length;
+
+        for(let row = 0; row < gameBoardLength; row ++){
+            for(let column = 0; column < gameBoardLength; column ++){
+                const newTile = createTile(row, column);
+
+                newTile.getTile().addEventListener('click', ()=>{
+
+                    if(gameBoard.isMoveLegal(row, column)) {
+                        gameBoard.makeMove(row, column);
+                        updateBoard();
+                        gameLoop.nextTurn();
+                    }
+                   
+                });
+                container.appendChild(newTile.getTile());  
+            }
+        }
+    })();
+
+    const updateBoard = function(){
+        console.clear();
+        console.table(gameBoard.getGameBoard());
+    }
+
+    updateBoard();
+
+    return { updateBoard }
 
 })();
 
@@ -159,11 +177,7 @@ function createTile(row, column){
     const getRow  = () => row;
     const getColumn = () => column;
 
-    const makeMove = function(){
-        gameBoard.makeMove(row, column);
-    }
-
-    return { getTile, getRow, getColumn, makeMove }
+    return { getTile, getRow, getColumn }
 }
 
 function createPlayer(token){
@@ -182,28 +196,29 @@ function createComputer(token){
 
          // 1) Always aim for the center in the beginning.
          if(gameBoard.getGameBoard()[1][1]==='') {
-            computerMove.row = 1;
-            computerMove.column = 1;
-            return computerMove
+            gameBoard.makeMove(1, 1);
+            displayController.updateBoard();
+            gameLoop.nextTurn();
+            return;
         }
 
         // 2) If center is taken, make a random move.
-        const generateRandomMove = function(){
-    
-            const generateNewMove = function(){
-                const row = getRandomInt(gameBoard.getGameBoard().length);
-                const column = getRandomInt(gameBoard.getGameBoard()[row].length);
-                const isLegalMove = gameBoard.isMoveLegal(row, column);
-                return { row, column, isLegalMove} 
-            }
-    
-            do{
-                computerMove = generateNewMove();
-            } while (!computerMove.isLegalMove);
-            return computerMove
+
+        const generateNewMove = function(){
+            const row = getRandomInt(gameBoard.getGameBoard().length);
+            const column = getRandomInt(gameBoard.getGameBoard().length);
+            const isLegalMove = gameBoard.isMoveLegal(row, column);
+            return { row, column, isLegalMove} 
         }
 
-        return generateRandomMove();
+        do{
+            computerMove = generateNewMove();
+        } while (!computerMove.isLegalMove);
+
+        gameBoard.makeMove(computerMove.row, computerMove.column);
+        displayController.updateBoard();
+        gameLoop.nextTurn();
+
     }
 
     return{ calculateMove, getToken }
