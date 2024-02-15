@@ -1,0 +1,30 @@
+*{
+    padding: 0;
+    margin: 0;
+}
+
+body{
+    border: 2px solid red;
+    height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #84A4B1;
+}
+
+.gameboard-container{
+    width: 500px;
+    height: 500px;
+    border: 1px solid red;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 24px;
+}
+
+.tile {
+    background-color: #EFEFEF;
+    border-radius: 12px;
+    cursor: pointer;
+}

@@ -73,7 +73,7 @@ const gameLoop = (function(){
 
     const nextTurn = function() {
         updateBoard();
-        
+
         //check for wins
         if(gameBoard.validateMove()) {
             win();
@@ -128,7 +128,7 @@ const gameLoop = (function(){
     }
     
     newGame();
-    nextTurn();
+    // nextTurn();
 
 })();
 
