@@ -169,8 +169,8 @@ const gameLoop = (function(){
 
         // 1 = player's turn.
         // 0 = computer's turn.
-        whoseTurn = 0;
-        lastToBegin = 0;
+        whoseTurn = 1;
+        lastToBegin = 1;
 
         //Show welcome message, and after 2 seconds, start the game.
         gameBoard.lockTiles();
@@ -261,7 +261,7 @@ const gameLoop = (function(){
             })
         })
 
-        newGame();
+        newGame(true);
     }
 
     const tie = function(){
