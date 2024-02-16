@@ -104,6 +104,23 @@ const displayController = (function(){
         }
     })();
 
+    const renderMessage = function(messageArray, delay = 0){
+        let index = 0;
+
+        setTimeout(()=>{
+
+            for (let row = 0; row < gameBoard.getGameBoard().length; row ++) {
+                for(let i = 0; i < gameBoard.getGameBoard().length; i ++){
+                    gameBoard.getGameBoard()[row][i].setValue(messageArray[index]);
+                    index ++;
+                }
+            }
+            
+        }, delay)
+        
+    }
+
+    return { renderMessage }
 
 })();
 
@@ -172,6 +189,10 @@ const gameLoop = (function(){
     }
     
     newGame();
+
+    //Show welcome message, and after 2 seconds, start the game.
+    displayController.renderMessage(['T','I','C','T','A','C','T','O','E']);
+    displayController.renderMessage([''], 3000);
 
     return { nextTurn }
 
