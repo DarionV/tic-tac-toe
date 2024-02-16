@@ -26,6 +26,7 @@ const gameBoard = (function(){
     const resetBoard = function() {
         getAllTiles().forEach((tile)=>{
             tile.setValue('');
+            tile.setToken('');
             tile.getTile().classList.remove('marked');
             })
     }
@@ -53,7 +54,6 @@ const gameBoard = (function(){
     }
 
     const makeMove = function(row, column){
-        // gameBoardArray[row][column].setValueWithFlip(token);
         gameBoardArray[row][column].getTile().classList.add('marked');
         gameBoardArray[row][column].setToken(token);
 
@@ -263,8 +263,8 @@ const gameLoop = (function(){
         //edit the losing tiles and then unlock all
         gameBoard.getGameBoard().forEach((row)=>{
             row.forEach((e)=>{
-                if(!e.getTile().classList.contains('locked')){
-                    e.setValue('');
+                if(!e.getTile().classList.contains('locked') && e.getToken() !==''){
+                    e.setToken('');
                 }
                 e.getTile().classList.remove('locked');
             })
@@ -310,7 +310,12 @@ function createTile(row, column){
         flip();
         token = newToken;
         setTimeout(()=>{
-            tile.classList.add(token);
+            if(token === '') {
+                tile.classList.remove('circle');
+                tile.classList.remove('cross');
+            } else {
+                 tile.classList.add(token);
+            }
         }, gameLoop.getAnimationDurationInMs() / 2)
     } 
 
