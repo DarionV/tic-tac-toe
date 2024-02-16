@@ -181,14 +181,17 @@ const gameLoop = (function(){
         setTimeout(nextTurn, 2000);
     }
 
-    const newGame = function(){
-        //Display score (after delay)
-        setTimeout(()=>{
-            displayController.renderScore(player.getToken(),computer.getToken(),player.getScore(),computer.getScore());
-        }, 2000);
+    const newGame = function(displayScore){
 
-        //Reset game board (after delay)
-        setTimeout(gameBoard.resetBoard, 4000);
+        if(displayScore){
+            //Display score (after delay)
+            setTimeout(()=>{
+                displayController.renderScore(player.getToken(),computer.getToken(),player.getScore(),computer.getScore());
+            }, 2000);
+        }
+
+         //Reset game board (after delay)
+         setTimeout(gameBoard.resetBoard, 4000);
 
         numberOfTurns = 0;
         
@@ -263,6 +266,7 @@ const gameLoop = (function(){
 
     const tie = function(){
         displayController.renderMessage(['','','','T','I','E','','',''],1000);
+        newGame(false);
     }
     
     initializeGame();
