@@ -128,10 +128,6 @@ const displayController = (function(){
                 const newTile = createTile(row, column);
                 gameBoard.addTileToGameBoard(newTile, row, column);
                 container.appendChild(newTile.getContainer());  
-
-                // const newTileShadow = document.createElement('div');
-                // newTileShadow.classList.add('shadow');
-                // document.querySelector('.js-shadow-container').appendChild(newTileShadow);
             }
         }
     })();
@@ -142,8 +138,16 @@ const displayController = (function(){
         for (let row = 0; row < gameBoard.getGameBoard().length; row ++) {
             for(let i = 0; i < gameBoard.getGameBoard().length; i ++){
 
-                if(shouldFlip) gameBoard.getGameBoard()[row][i].setValueWithFlip(messageArray[index]);
-                else gameBoard.getGameBoard()[row][i].setValue(messageArray[index]);
+                if(shouldFlip) {
+                    if(gameBoard.getGameBoard()[row][i].getValue() !== messageArray[index] ||
+                    gameBoard.getGameBoard()[row][i].getToken() !== messageArray[index]){
+                        gameBoard.getGameBoard()[row][i].setValueWithFlip(messageArray[index]);
+                        gameBoard.getGameBoard()[row][i].setToken('');
+                    }
+                }
+                else {
+                    gameBoard.getGameBoard()[row][i].setValue(messageArray[index]);
+                }
 
                 index ++;
             }
@@ -151,7 +155,7 @@ const displayController = (function(){
     }
 
     const renderScore = function(playerToken, computerToken, playerScore, compterScore){
-        renderMessage([playerToken, '', computerToken, playerScore, '-', compterScore,'','',''])
+        renderMessage([playerToken, '', computerToken, playerScore, '-', compterScore,'','',''], true)
     }
 
     return { renderMessage, renderScore }
@@ -310,14 +314,16 @@ function createTile(row, column){
         flip();
         token = newToken;
         setTimeout(()=>{
-            if(token === '') {
-                tile.classList.remove('circle');
-                tile.classList.remove('cross');
-            } else {
-                 tile.classList.add(token);
-            }
+            if(token === '') removeToken();
+            else tile.classList.add(token);
+
         }, gameLoop.getAnimationDurationInMs() / 2)
     } 
+
+    const removeToken = function(){
+        tile.classList.remove('circle');
+        tile.classList.remove('cross');
+    }
 
     const getTile = () => tile;
     const getContainer = () => container;
@@ -355,7 +361,7 @@ function createTile(row, column){
        
     });    
 
-    return { getTile, getRow, getColumn, getValue, setValue, getContainer, setValueWithFlip, setToken, getToken}
+    return { getTile, getRow, getColumn, getValue, setValue, getContainer, setValueWithFlip, setToken, getToken }
 }
 
 function createPlayer(token){
