@@ -37,7 +37,7 @@ const gameBoard = (function(){
     const getToken = () => token;
 
     const isMoveLegal = function(row, column){
-        return gameBoardArray[row][column].getValue() === '';
+        return gameBoardArray[row][column].getToken() === '';
     }
 
     const lockTiles = function(){
@@ -53,8 +53,10 @@ const gameBoard = (function(){
     }
 
     const makeMove = function(row, column){
-        gameBoardArray[row][column].setValue(token);
+        // gameBoardArray[row][column].setValueWithFlip(token);
         gameBoardArray[row][column].getTile().classList.add('marked');
+        gameBoardArray[row][column].setToken(token);
+
     }
 
     let winningTiles = [];
@@ -69,7 +71,7 @@ const gameBoard = (function(){
 
         // 1) check rows for winner
         gameBoardArray.forEach((row) => {
-            if(row[0].getValue()!== '') {
+            if(row[0].getToken()!== '') {
                 if(allEqual(row)) {
                     isWinningMove = true;
                     winningTiles = row;
@@ -84,7 +86,7 @@ const gameBoard = (function(){
             gameBoardArray.forEach((row)=>{
                 column.push(row[i]);
             })
-            if(column[0].getValue() !== '') {
+            if(column[0].getToken() !== '') {
                 if(allEqual(column)) {
                     isWinningMove = true;
                     winningTiles = column;
@@ -96,7 +98,7 @@ const gameBoard = (function(){
         const firstDiagonal = [gameBoardArray[0][0], gameBoardArray[1][1], gameBoardArray[2][2]];
         const secondDiagonal = [gameBoardArray[0][2], gameBoardArray[1][1], gameBoardArray[2][0]];
         
-        if (firstDiagonal[1].getValue() !== ''){
+        if (firstDiagonal[1].getToken() !== ''){
             if(allEqual(firstDiagonal)) {
                 isWinningMove = true;
                 winningTiles = firstDiagonal;
@@ -125,7 +127,7 @@ const displayController = (function(){
             for(let column = 0; column < gameBoardLength; column ++){
                 const newTile = createTile(row, column);
                 gameBoard.addTileToGameBoard(newTile, row, column);
-                container.appendChild(newTile.getTile());  
+                container.appendChild(newTile.getContainer());  
 
                 // const newTileShadow = document.createElement('div');
                 // newTileShadow.classList.add('shadow');
@@ -134,20 +136,18 @@ const displayController = (function(){
         }
     })();
 
-    const renderMessage = function(messageArray, delay = 0){
+    const renderMessage = function(messageArray, shouldFlip){
         let index = 0;
 
-        setTimeout(()=>{
+        for (let row = 0; row < gameBoard.getGameBoard().length; row ++) {
+            for(let i = 0; i < gameBoard.getGameBoard().length; i ++){
 
-            for (let row = 0; row < gameBoard.getGameBoard().length; row ++) {
-                for(let i = 0; i < gameBoard.getGameBoard().length; i ++){
-                    gameBoard.getGameBoard()[row][i].setValue(messageArray[index]);
-                    index ++;
-                }
+                if(shouldFlip) gameBoard.getGameBoard()[row][i].setValueWithFlip(messageArray[index]);
+                else gameBoard.getGameBoard()[row][i].setValue(messageArray[index]);
+
+                index ++;
             }
-            
-        }, delay)
-        
+        }
     }
 
     const renderScore = function(playerToken, computerToken, playerScore, compterScore){
@@ -162,14 +162,17 @@ const displayController = (function(){
 const gameLoop = (function(){
 
     const MAX_NUMBER_OF_TURNS = gameBoard.getNumberOfTiles();
+    const ANIMATION_DURATION_IN_MS = 500;
     let numberOfTurns = 0;
     let whoseTurn = 1;
     let player = {};
     let computer = {};
 
+    const getAnimationDurationInMs = () => ANIMATION_DURATION_IN_MS;
+
     const initializeGame = function() {
-        player = createPlayer('X');
-        computer = createComputer('O');
+        player = createPlayer('cross');
+        computer = createComputer('circle');
 
         // 1 = player's turn.
         // 0 = computer's turn.
@@ -179,10 +182,12 @@ const gameLoop = (function(){
         //Show welcome message, and after 2 seconds, start the game.
         gameBoard.lockTiles();
         displayController.renderMessage(['T','I','C','T','A','C','T','O','E']);
-        displayController.renderMessage([''], 2000);
+        setTimeout(()=>{
+            displayController.renderMessage([''], true);
+        }, 2000)
         setTimeout(gameBoard.unlockTiles,2000);
 
-        setTimeout(nextTurn, 2000);
+        setTimeout(nextTurn, 2000 + ANIMATION_DURATION_IN_MS);
     }
 
     const newGame = function(displayScore){
@@ -275,7 +280,7 @@ const gameLoop = (function(){
     
     initializeGame();
 
-    return { nextTurn }
+    return { nextTurn, getAnimationDurationInMs }
 
 })();
 
@@ -298,11 +303,39 @@ function createTile(row, column){
     shadow.classList.add('shadow');
     container.appendChild(shadow);
 
-    const getTile = () => container;
+    let token = '';
+
+    const getToken = () => token;
+    const setToken = function(newToken) {
+        flip();
+        token = newToken;
+        setTimeout(()=>{
+            tile.classList.add(token);
+        }, gameLoop.getAnimationDurationInMs() / 2)
+    } 
+
+    const getTile = () => tile;
+    const getContainer = () => container;
     const getRow  = () => row;
     const getColumn = () => column;
     const getValue= () => tile.textContent; 
-    const setValue = (value) => tile.textContent = value; //Make tile flip here later...
+    const setValue = function (value) {
+            tile.textContent = value;
+    }
+
+    const setValueWithFlip = function(value){
+        flip();
+        setTimeout(()=>{
+            tile.textContent = value;
+        }, gameLoop.getAnimationDurationInMs() / 2);
+    }
+
+    const flip = function() {
+        container.classList.add('flip');
+        setTimeout(()=>{
+            container.classList.remove('flip');
+        }, gameLoop.getAnimationDurationInMs() + 100);
+    }
 
     tile.addEventListener('click', ()=>{
 
@@ -317,7 +350,7 @@ function createTile(row, column){
        
     });    
 
-    return { getTile, getRow, getColumn, getValue, setValue }
+    return { getTile, getRow, getColumn, getValue, setValue, getContainer, setValueWithFlip, setToken, getToken}
 }
 
 function createPlayer(token){
@@ -339,7 +372,7 @@ function createComputer(token){
         let computerMove = {};
 
          // 1) Always aim for the center in the beginning.
-         if(gameBoard.getGameBoard()[1][1].getValue() === '') {
+         if(gameBoard.getGameBoard()[1][1].getToken() === '') {
             gameBoard.makeMove(1, 1);
             gameLoop.nextTurn();
             return;
@@ -372,6 +405,6 @@ function getRandomInt(max) {
 
 function allEqual(array){
     return array.every(function(element){
-        return element.getValue() === array[0].getValue();
+        return element.getToken() === array[0].getToken();
     });
 }
