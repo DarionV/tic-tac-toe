@@ -7,22 +7,6 @@ const gameBoard = (function(){
         gameBoardArray[row][column] = tile;
     }
 
-    const getGameBoardContainer = () => document.querySelector('.js-gameboard-container');
-
-    const getNumberOfTiles = () => Math.pow(gameBoardArray.length, 2);
-
-    const resetBoard = function() {}
-
-    let token = '';
-
-    const setToken = (value) => token = value;
-
-    const getToken = () => token;
-
-    const isMoveLegal = function(row, column){
-        return gameBoardArray[row][column].getValue() === '';
-    }
-
     const getAllTiles = function(){
         let allTiles = [];
 
@@ -33,6 +17,28 @@ const gameBoard = (function(){
         }
 
         return allTiles;
+    }
+
+    const getGameBoardContainer = () => document.querySelector('.js-gameboard-container');
+
+    const getNumberOfTiles = () => Math.pow(gameBoardArray.length, 2);
+
+    const resetBoard = function() {
+        getAllTiles().forEach((tile)=>{
+            tile.setValue('');
+            })
+
+        unlockTiles();
+    }
+
+    let token = '';
+
+    const setToken = (value) => token = value;
+
+    const getToken = () => token;
+
+    const isMoveLegal = function(row, column){
+        return gameBoardArray[row][column].getValue() === '';
     }
 
     const lockTiles = function(){
@@ -105,12 +111,8 @@ const gameBoard = (function(){
         return isWinningMove;
     }
 
-    const showWinningTiles = function(){
-
-    }
-
     return { getGameBoard,getGameBoardContainer, resetBoard, isMoveLegal, 
-        makeMove, validateMove, showWinningTiles, getNumberOfTiles, setToken, 
+        makeMove, validateMove, getNumberOfTiles, setToken, 
         getToken, addTileToGameBoard, getWinningTiles, getAllTiles, lockTiles, unlockTiles}
 })();
 
@@ -145,7 +147,11 @@ const displayController = (function(){
         
     }
 
-    return { renderMessage }
+    const renderScore = function(playerToken, computerToken, playerScore, compterScore){
+        renderMessage([playerToken, '', computerToken, playerScore, '-', compterScore,'','',''])
+    }
+
+    return { renderMessage, renderScore }
 
 })();
 
@@ -158,16 +164,33 @@ const gameLoop = (function(){
     let player = {};
     let computer = {};
 
-    const newGame = function() {
+    const initializeGame = function() {
         player = createPlayer('X');
         computer = createComputer('O');
+    }
+
+    const newGame = function(){
+        //Display score, after delay.
+        setTimeout(()=>{
+            displayController.renderScore('X','O',1,5);
+        }, 2000);
+
+        //Reset game board after delay,
+        setTimeout(gameBoard.resetBoard, 4000);
+
+        numberOfTurns = 1;
+
+        whoseTurn = 0;
     }
 
     const nextTurn = function() {
 
         //check for wins
         if(gameBoard.validateMove()) {
-            win(gameBoard.validateMove());
+            setTimeout(()=>{
+                win(gameBoard.validateMove());
+            }, 500);
+            
             return
         }
         //check for ties
@@ -189,7 +212,7 @@ const gameLoop = (function(){
     }
 
     const makeComputerMove = function() {
-        computer.calculateMove();      
+        setTimeout(computer.calculateMove, 500);     
     }
 
     const win = function() {
@@ -197,10 +220,12 @@ const gameLoop = (function(){
         gameBoard.lockTiles();
 
         console.log(gameBoard.getToken() + ' won!');
+
+        //lock winning tiles for editing
         gameBoard.getWinningTiles().forEach((e)=>{
             e.getTile().classList.add('locked');
         });
-
+        //edit the losing tiles and then unlock all
         gameBoard.getGameBoard().forEach((row)=>{
             row.forEach((e)=>{
                 if(!e.getTile().classList.contains('locked')){
@@ -209,14 +234,14 @@ const gameLoop = (function(){
                 e.getTile().classList.remove('locked');
             })
         })
-        
+        newGame();
     }
 
     const tie = function(){
-        displayController.renderMessage(['','','','T','I','E','','',''],2000);
+        displayController.renderMessage(['','','','T','I','E','','',''],1000);
     }
     
-    newGame();
+    initializeGame();
     nextTurn();
 
     //Show welcome message, and after 2 seconds, start the game.
