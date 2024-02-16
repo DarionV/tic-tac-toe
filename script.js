@@ -23,6 +23,30 @@ const gameBoard = (function(){
         return gameBoardArray[row][column].getValue() === '';
     }
 
+    const getAllTiles = function(){
+        let allTiles = [];
+
+        for (let row = 0; row < gameBoardArray.length; row ++) {
+            for(let i = 0; i < gameBoardArray.length; i ++){
+                allTiles.push(gameBoardArray[row][i]);
+            }
+        }
+
+        return allTiles;
+    }
+
+    const lockTiles = function(){
+        getAllTiles().forEach((tile) =>{
+            tile.getTile().classList.add('non-clickable');
+        })
+    }
+
+    const unlockTiles = function(){
+        getAllTiles().forEach((tile) =>{
+            tile.getTile().classList.remove('non-clickable');
+        })
+    }
+
     const makeMove = function(row, column){
         gameBoardArray[row][column].setValue(token);
 
@@ -86,7 +110,8 @@ const gameBoard = (function(){
     }
 
     return { getGameBoard,getGameBoardContainer, resetBoard, isMoveLegal, 
-        makeMove, validateMove, showWinningTiles, getNumberOfTiles, setToken, getToken, addTileToGameBoard, getWinningTiles}
+        makeMove, validateMove, showWinningTiles, getNumberOfTiles, setToken, 
+        getToken, addTileToGameBoard, getWinningTiles, getAllTiles, lockTiles, unlockTiles}
 })();
 
 const displayController = (function(){
@@ -168,6 +193,9 @@ const gameLoop = (function(){
     }
 
     const win = function() {
+
+        gameBoard.lockTiles();
+
         console.log(gameBoard.getToken() + ' won!');
         gameBoard.getWinningTiles().forEach((e)=>{
             e.getTile().classList.add('locked');
@@ -185,14 +213,17 @@ const gameLoop = (function(){
     }
 
     const tie = function(){
-        console.log('TIE');
+        displayController.renderMessage(['','','','T','I','E','','',''],2000);
     }
     
     newGame();
+    nextTurn();
 
     //Show welcome message, and after 2 seconds, start the game.
+    gameBoard.lockTiles();
     displayController.renderMessage(['T','I','C','T','A','C','T','O','E']);
-    displayController.renderMessage([''], 3000);
+    displayController.renderMessage([''], 2000);
+    setTimeout(gameBoard.unlockTiles,2000);
 
     return { nextTurn }
 
@@ -211,14 +242,16 @@ function createTile(row, column){
 
     tile.addEventListener('click', ()=>{
 
+        if(tile.classList.contains('non-clickable')) return;
+
         if(gameBoard.isMoveLegal(row, column)) {
             gameBoard.makeMove(row, column);
             gameLoop.nextTurn();
+            tile.classList.remove('cursor');
+            tile.classList.add('non-clickable');
         }
        
-    });
-
-    
+    });    
 
     return { getTile, getRow, getColumn, getValue, setValue }
 }
