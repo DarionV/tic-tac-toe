@@ -154,8 +154,8 @@ const displayController = (function(){
         }
     }
 
-    const renderScore = function(playerToken, computerToken, playerScore, compterScore){
-        renderMessage([playerToken, '', computerToken, playerScore, '-', compterScore,'','',''], true)
+    const renderScore = function(playerScore, compterScore){
+        renderMessage(['', '', '', playerScore, '-', compterScore,'','',''], true)
     }
 
     return { renderMessage, renderScore }
@@ -199,7 +199,7 @@ const gameLoop = (function(){
         if(displayScore){
             //Display score (after delay)
             setTimeout(()=>{
-                displayController.renderScore(player.getToken(),computer.getToken(),player.getScore(),computer.getScore());
+                displayController.renderScore(player.getScore(),computer.getScore());
             }, 2000);
         }
 
@@ -217,7 +217,7 @@ const gameLoop = (function(){
             lastToBegin = 1;
         }
 
-        setTimeout(nextTurn, 4000);
+        setTimeout(nextTurn, 4600);
 
     }
 
@@ -260,7 +260,7 @@ const gameLoop = (function(){
 
         whoseTurn ? computer.increaseScore() : player.increaseScore();
 
-        //lock winning tiles for editing
+        //lock winning tiles for editing 
         gameBoard.getWinningTiles().forEach((e)=>{
             e.getTile().classList.add('locked');
         });
@@ -271,6 +271,8 @@ const gameLoop = (function(){
                     e.setToken('');
                 }
                 e.getTile().classList.remove('locked');
+                //the 'marked' class prevents the hover effect to fire as per CSS rule.
+                e.getTile().classList.add('marked')
             })
         })
 
