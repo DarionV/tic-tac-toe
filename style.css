@@ -4,7 +4,7 @@
 }
 
 body{
-    border: 2px solid red;
+    /* border: 2px solid red; */
     height: 100vh;
     box-sizing: border-box;
     display: flex;
@@ -16,7 +16,7 @@ body{
 .gameboard-container{
     width: 500px;
     height: 500px;
-    border: 1px solid red;
+    /* border: 1px solid red; */
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr;
@@ -41,17 +41,30 @@ body{
     cursor: pointer;
     height: 100%;
     width: 100%;
-    z-index: 2;
-    animation: flip 0.5s linear ;
+    z-index: 3;
+    animation: flip 0.5s linear;
 }
 
 .edge{
     width: 100%;
     height: 20%;
     position: absolute;
-    animation: edge-flip 0.5s linear ;
+    animation: edge-flip 0.5s linear;
+    z-index: 2;
 
 } 
+
+.shadow {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: #637B85;
+    top: 8px;
+    left: -8px;
+    border-radius: 12px;
+    z-index: 1;
+    animation: shadow-flip 0.5s linear;
+}
 
 .tile>div{
     width: 50%;
@@ -66,6 +79,28 @@ body{
     cursor: default;
 }
 
+@keyframes shadow-flip {
+    0%{
+
+      
+    }
+
+    50%{
+        translate: -10px 90px;
+        scale: 100% 110%;
+    }
+
+    /* 70%{
+        translate: -40px 80px;
+        scale: 100% 120%;
+   
+    } */
+
+    100%{
+  
+
+    }
+}
 
 @keyframes edge-flip {
     0%{

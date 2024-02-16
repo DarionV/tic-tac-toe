@@ -283,13 +283,20 @@ const gameLoop = (function(){
 function createTile(row, column){
     const container = document.createElement('div');
     container.classList.add('tile-container');
+
     const tile = document.createElement('div');
+    tile.classList.add('tile');
     container.appendChild(tile);
+
+    //Edge element that is only visible during flip animation
     const edge = document.createElement('div');
     edge.classList.add('edge');
     container.appendChild(edge);
 
-    tile.classList.add('tile');
+    //Shadow element 
+    const shadow = document.createElement('div');
+    shadow.classList.add('shadow');
+    container.appendChild(shadow);
 
     const getTile = () => container;
     const getRow  = () => row;
