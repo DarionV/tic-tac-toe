@@ -26,9 +26,8 @@ const gameBoard = (function(){
     const resetBoard = function() {
         getAllTiles().forEach((tile)=>{
             tile.setValue('');
+            tile.getTile().classList.remove('marked');
             })
-
-        unlockTiles();
     }
 
     let token = '';
@@ -55,7 +54,7 @@ const gameBoard = (function(){
 
     const makeMove = function(row, column){
         gameBoardArray[row][column].setValue(token);
-
+        gameBoardArray[row][column].getTile().classList.add('marked');
     }
 
     let winningTiles = [];
@@ -167,22 +166,43 @@ const gameLoop = (function(){
     const initializeGame = function() {
         player = createPlayer('X');
         computer = createComputer('O');
+
+        // 1 = player's turn.
+        // 0 = computer's turn.
+        whoseTurn = 0;
+        lastToBegin = 0;
+
+        //Show welcome message, and after 2 seconds, start the game.
+        gameBoard.lockTiles();
+        displayController.renderMessage(['T','I','C','T','A','C','T','O','E']);
+        displayController.renderMessage([''], 2000);
+        setTimeout(gameBoard.unlockTiles,2000);
+
+        setTimeout(nextTurn, 2000);
     }
 
     const newGame = function(){
-        //Display score, after delay.
+        //Display score (after delay)
         setTimeout(()=>{
             displayController.renderScore(player.getToken(),computer.getToken(),player.getScore(),computer.getScore());
         }, 2000);
 
-        //Reset game board after delay,
+        //Reset game board (after delay)
         setTimeout(gameBoard.resetBoard, 4000);
 
-        numberOfTurns = 1;
+        numberOfTurns = 0;
+        
+        //Decide who will go first
+        if(lastToBegin) {
+            whoseTurn = 0;
+            lastToBegin = 0;
+        } else {
+            whoseTurn = 1;
+            lastToBegin = 1;
+        }
 
-        whoseTurn = 0;
+        setTimeout(nextTurn, 4000);
 
-        console.log('new game: ' + whoseTurn)
     }
 
     const nextTurn = function() {
@@ -206,6 +226,7 @@ const gameLoop = (function(){
         if(whoseTurn) { 
             whoseTurn = 0;
             gameBoard.setToken(player.getToken());
+            gameBoard.unlockTiles();
         } else {
             whoseTurn = 1;
             gameBoard.setToken(computer.getToken());
@@ -245,13 +266,6 @@ const gameLoop = (function(){
     }
     
     initializeGame();
-    nextTurn();
-
-    //Show welcome message, and after 2 seconds, start the game.
-    gameBoard.lockTiles();
-    displayController.renderMessage(['T','I','C','T','A','C','T','O','E']);
-    displayController.renderMessage([''], 2000);
-    setTimeout(gameBoard.unlockTiles,2000);
 
     return { nextTurn }
 
@@ -276,7 +290,7 @@ function createTile(row, column){
             gameBoard.makeMove(row, column);
             gameLoop.nextTurn();
             tile.classList.remove('cursor');
-            tile.classList.add('non-clickable');
+            gameBoard.lockTiles();
         }
        
     });    
@@ -324,7 +338,6 @@ function createComputer(token){
 
         gameBoard.makeMove(computerMove.row, computerMove.column);
         gameLoop.nextTurn();
-
     }
 
     return{ calculateMove, getToken, getScore, increaseScore }

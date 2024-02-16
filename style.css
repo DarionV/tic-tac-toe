@@ -37,3 +37,7 @@ body{
 .non-clickable {
     cursor: default;
 }
+
+.marked{
+    cursor: default;
+}
