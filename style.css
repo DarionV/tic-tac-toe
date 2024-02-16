@@ -29,6 +29,12 @@ body{
     justify-content: center;
     align-items: center;
     position: relative;
+    font-family: "Fredoka", sans-serif;
+    font-size: 80px;
+    font-weight: 600;
+    font-style: normal;
+    color: rgba(83, 83, 83, 0.8);
+    text-shadow: 1px 4px 6px rgb(251, 251, 251), 0 0 0 #000, 1px 4px 6px rgb(255, 255, 255);
 }
 
 .tile {
@@ -37,7 +43,6 @@ body{
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 50px;
     user-select: none;
     cursor: pointer;
     height: 100%;
