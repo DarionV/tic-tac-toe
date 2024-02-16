@@ -25,8 +25,8 @@ const gameBoard = (function(){
 
     const resetBoard = function() {
         getAllTiles().forEach((tile)=>{
-            tile.setValue('');
-            tile.setToken('');
+            if(tile.getValue() !== '')tile.setValueWithFlip('');
+            if(tile.getToken() !== '')tile.setToken('');
             tile.getTile().classList.remove('marked');
             })
     }
