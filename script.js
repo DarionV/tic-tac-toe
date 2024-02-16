@@ -187,7 +187,8 @@ const gameLoop = (function(){
         gameBoard.lockTiles();
         displayController.renderMessage(['T','I','C','T','A','C','T','O','E']);
         setTimeout(()=>{
-            displayController.renderMessage([''], true);
+            // displayController.renderMessage([''], true);
+            gameBoard.resetBoard();
         }, 2000)
         setTimeout(gameBoard.unlockTiles,2000);
 
@@ -200,11 +201,11 @@ const gameLoop = (function(){
             //Display score (after delay)
             setTimeout(()=>{
                 displayController.renderScore(player.getScore(),computer.getScore());
-            }, 2000);
+            }, 1000);
         }
 
          //Reset game board (after delay)
-         setTimeout(gameBoard.resetBoard, 4000);
+         setTimeout(gameBoard.resetBoard, 2500);
 
         numberOfTurns = 0;
         
@@ -217,7 +218,7 @@ const gameLoop = (function(){
             lastToBegin = 1;
         }
 
-        setTimeout(nextTurn, 4600);
+        setTimeout(nextTurn, 3000);
 
     }
 
@@ -296,7 +297,8 @@ function createTile(row, column){
     container.classList.add('tile-container');
 
     const tile = document.createElement('div');
-    tile.classList.add('tile');
+    //marked will prevent hover state from firing at welcome screen (as per CSS rule)
+    tile.classList.add('tile', 'marked');
     container.appendChild(tile);
 
     //Edge element that is only visible during flip animation
