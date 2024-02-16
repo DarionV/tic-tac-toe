@@ -126,6 +126,10 @@ const displayController = (function(){
                 const newTile = createTile(row, column);
                 gameBoard.addTileToGameBoard(newTile, row, column);
                 container.appendChild(newTile.getTile());  
+
+                // const newTileShadow = document.createElement('div');
+                // newTileShadow.classList.add('shadow');
+                // document.querySelector('.js-shadow-container').appendChild(newTileShadow);
             }
         }
     })();
@@ -277,10 +281,17 @@ const gameLoop = (function(){
 
 
 function createTile(row, column){
+    const container = document.createElement('div');
+    container.classList.add('tile-container');
     const tile = document.createElement('div');
+    container.appendChild(tile);
+    const edge = document.createElement('div');
+    edge.classList.add('edge');
+    container.appendChild(edge);
+
     tile.classList.add('tile');
 
-    const getTile = () => tile;
+    const getTile = () => container;
     const getRow  = () => row;
     const getColumn = () => column;
     const getValue= () => tile.textContent; 
