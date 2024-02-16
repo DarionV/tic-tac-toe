@@ -31,6 +31,20 @@ const gameBoard = (function(){
             })
     }
 
+    const resetBoardWave = function(){
+        let delay = 100;
+
+        for(let i = 0; i < getAllTiles().length; i++){
+            setTimeout(() => {
+                if(getAllTiles()[i].getValue() !== '')getAllTiles()[i].setValueWithFlip('');
+                if(getAllTiles()[i].getToken() !== '')getAllTiles()[i].setToken('');
+                getAllTiles()[i].getTile().classList.remove('marked');
+            }, delay)
+
+            delay += 100;
+        }
+    }
+
     let token = '';
 
     const setToken = (value) => token = value;
@@ -112,7 +126,7 @@ const gameBoard = (function(){
         return isWinningMove;
     }
 
-    return { getGameBoard,getGameBoardContainer, resetBoard, isMoveLegal, 
+    return { getGameBoard,getGameBoardContainer, resetBoard, resetBoardWave, isMoveLegal, 
         makeMove, validateMove, getNumberOfTiles, setToken, 
         getToken, addTileToGameBoard, getWinningTiles, getAllTiles, lockTiles, unlockTiles}
 })();
@@ -188,8 +202,8 @@ const gameLoop = (function(){
         displayController.renderMessage(['T','I','C','T','A','C','T','O','E']);
         setTimeout(()=>{
             // displayController.renderMessage([''], true);
-            gameBoard.resetBoard();
-        }, 2000)
+            gameBoard.resetBoardWave();
+        }, 1500)
         setTimeout(gameBoard.unlockTiles,2000);
 
         setTimeout(nextTurn, 2000 + ANIMATION_DURATION_IN_MS);
