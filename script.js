@@ -172,7 +172,7 @@ const gameLoop = (function(){
     const newGame = function(){
         //Display score, after delay.
         setTimeout(()=>{
-            displayController.renderScore('X','O',1,5);
+            displayController.renderScore(player.getToken(),computer.getToken(),player.getScore(),computer.getScore());
         }, 2000);
 
         //Reset game board after delay,
@@ -181,6 +181,8 @@ const gameLoop = (function(){
         numberOfTurns = 1;
 
         whoseTurn = 0;
+
+        console.log('new game: ' + whoseTurn)
     }
 
     const nextTurn = function() {
@@ -219,7 +221,7 @@ const gameLoop = (function(){
 
         gameBoard.lockTiles();
 
-        console.log(gameBoard.getToken() + ' won!');
+        whoseTurn ? computer.increaseScore() : player.increaseScore();
 
         //lock winning tiles for editing
         gameBoard.getWinningTiles().forEach((e)=>{
@@ -234,6 +236,7 @@ const gameLoop = (function(){
                 e.getTile().classList.remove('locked');
             })
         })
+
         newGame();
     }
 
@@ -283,13 +286,17 @@ function createTile(row, column){
 
 function createPlayer(token){
 
-    const getToken = () => token;
+    let score = 0;
 
-    return { getToken }
+    const getToken = () => token;
+    const getScore = () => score;
+    const increaseScore = () => score ++;
+
+    return { getToken, getScore, increaseScore }
 }
 
 function createComputer(token){
-    const { getToken } = createPlayer(token);
+    const { getToken, getScore, increaseScore  } = createPlayer(token);
 
     const calculateMove = function(){
 
@@ -320,7 +327,7 @@ function createComputer(token){
 
     }
 
-    return{ calculateMove, getToken }
+    return{ calculateMove, getToken, getScore, increaseScore }
 g
 }
 
