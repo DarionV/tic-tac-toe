@@ -158,7 +158,7 @@ body{
         background-color: #ffffff;
     }
 
-    82%{
+    88%{
         top:0%;
         
     }
@@ -184,11 +184,11 @@ body{
         background-color: #ffffff;
     }
     51%{
-        translate: 0px 20px;
-        background-color: #c2c2c2;
+        translate: 0px 30px;
+        background-color: #ffffff;
+        
     }
-
-    70%{
+    52%{
         background-color: #c2c2c2;
     }
 
