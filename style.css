@@ -52,7 +52,7 @@ body{
     transition-duration: 0.2s;
 }
 
-.tile:hover:not(.marked){
+.tile:hover:not(.non-clickable, .marked){
     transform: rotateX(15deg);
 }
 
@@ -67,7 +67,7 @@ body{
     border-radius: 12px;
 } 
 
-.tile:hover:not(.marked)~ .edge{
+.tile:hover:not(.non-clickable, .marked)~ .edge{
     top: 123px;
 }
 
@@ -98,7 +98,7 @@ body{
     transition-duration: 0.2s;
 }
 
-.tile:hover:not(.marked)~ .shadow{
+.tile:hover:not(.non-clickable, .marked)~ .shadow{
     top: 12px;
 }
 

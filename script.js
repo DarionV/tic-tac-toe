@@ -203,13 +203,16 @@ const gameLoop = (function(){
         setTimeout(()=>{
             // displayController.renderMessage([''], true);
             gameBoard.resetBoardWave();
-        }, 1500)
-        setTimeout(gameBoard.unlockTiles,2000);
+        }, 100)
+        setTimeout(gameBoard.unlockTiles,1500);
 
-        setTimeout(nextTurn, 2000 + ANIMATION_DURATION_IN_MS);
+        setTimeout(nextTurn, 1000 + ANIMATION_DURATION_IN_MS);
     }
 
     const newGame = function(displayScore){
+
+        let delay = 0;
+        displayScore ? delay = 3000 : delay = 1900; 
 
         if(displayScore){
             //Display score (after delay)
@@ -219,7 +222,7 @@ const gameLoop = (function(){
         }
 
          //Reset game board (after delay)
-         setTimeout(gameBoard.resetBoard, 2500);
+         setTimeout(gameBoard.resetBoard, delay - 500);
 
         numberOfTurns = 0;
         
@@ -232,7 +235,7 @@ const gameLoop = (function(){
             lastToBegin = 1;
         }
 
-        setTimeout(nextTurn, 3000);
+        setTimeout(nextTurn, delay);
 
     }
 
@@ -248,7 +251,10 @@ const gameLoop = (function(){
         }
         //check for ties
         if(numberOfTurns === MAX_NUMBER_OF_TURNS) {
-            tie();
+            setTimeout(()=>{
+                tie();
+            }, 1000);
+            
             return
         }
 
@@ -286,8 +292,6 @@ const gameLoop = (function(){
                     e.setToken('');
                 }
                 e.getTile().classList.remove('locked');
-                //the 'marked' class prevents the hover effect to fire as per CSS rule.
-                e.getTile().classList.add('marked')
             })
         })
 
@@ -295,7 +299,7 @@ const gameLoop = (function(){
     }
 
     const tie = function(){
-        displayController.renderMessage(['','','','T','I','E','','',''],1000);
+        displayController.renderMessage(['','','','T','I','E','','',''], true);
         newGame(false);
     }
     
@@ -311,8 +315,7 @@ function createTile(row, column){
     container.classList.add('tile-container');
 
     const tile = document.createElement('div');
-    //marked will prevent hover state from firing at welcome screen (as per CSS rule)
-    tile.classList.add('tile', 'marked');
+    tile.classList.add('tile');
     container.appendChild(tile);
 
     //Edge element that is only visible during flip animation
