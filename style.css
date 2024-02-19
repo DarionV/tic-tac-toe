@@ -4,7 +4,6 @@
 }
 
 body{
-    /* border: 2px solid red; */
     height: 100vh;
     box-sizing: border-box;
     display: flex;
@@ -44,7 +43,6 @@ a:hover{
 .gameboard-container{
     width: 500px;
     height: 500px;
-    /* border: 1px solid red; */
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr;
@@ -80,6 +78,7 @@ a:hover{
     z-index: 3;
     transition-property: transform;
     transition-duration: 0.2s;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .tile:hover:not(.non-clickable, .marked){
@@ -226,6 +225,17 @@ a:hover{
         transform: rotateX(0deg);
         background-color: #EFEFEF;
     }
+}
+
+@media screen and (max-width: 600px) {
+    .gameboard-container{
+        margin: 16px;
+        gap: 16px;
+  }
+
+  body{ 
+    height: 100dvh;
+  }
 }
 
 
