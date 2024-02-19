@@ -8,9 +8,37 @@ body{
     height: 100vh;
     box-sizing: border-box;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     background-color: #84A4B1;
+}
+
+.content{
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+footer{
+    margin-top: auto;
+    width: 100vw;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: top;
+    font-family: "Inter", sans-serif;
+    font-size: 16px;
+}
+
+a{
+    text-decoration: none;
+    color: #E5E5E5
+}
+a:hover{
+    color: white;
 }
 
 .gameboard-container{
@@ -77,14 +105,14 @@ body{
     background-image: url(images/cross.svg);
     background-repeat: no-repeat;
     background-size: 50%;
-    background-position: center;
+    background-position: 48% 52%;
 }
 
 .circle {
     background-image: url(images/circle.svg);
     background-repeat: no-repeat;
     background-size: 60%;
-    background-position: center;
+    background-position: 48% 52%;
 }
 
 .shadow {
