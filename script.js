@@ -1,6 +1,16 @@
 const gameBoard = (function(){
     let gameBoardArray = [["","",""],["","",""],["","",""]];
 
+    let winningTiles = [];
+
+    let token = '';
+
+    const getWinningTiles = () => winningTiles;
+
+    const setToken = (value) => token = value;
+
+    const getToken = () => token;
+
     const getGameBoard = () => gameBoardArray;
 
     const addTileToGameBoard = function(tile, row, column) {
@@ -15,7 +25,6 @@ const gameBoard = (function(){
                 allTiles.push(gameBoardArray[row][i]);
             }
         }
-
         return allTiles;
     }
 
@@ -41,17 +50,15 @@ const gameBoard = (function(){
 
     const getGameBoardContainer = () => document.querySelector('.js-gameboard-container');
 
-    const getNumberOfTiles = () => Math.pow(gameBoardArray.length, 2);
-
     const resetBoard = function() {
         getAllTiles().forEach((tile)=>{
-            if(tile.getValue() !== '')tile.setValueWithFlip('');
-            if(tile.getToken() !== '')tile.setToken('');
-            tile.getTile().classList.remove('marked');
+                if(tile.getValue() !== '')tile.setValueWithFlip('');
+                if(tile.getToken() !== '')tile.setToken('');
+                tile.getTile().classList.remove('marked');
             })
     }
 
-    const resetBoardWave = function(){
+    const resetBoardWave = function(speed = 100){
         let delay = 100;
 
         for(let i = 0; i < getAllTiles().length; i++){
@@ -61,15 +68,9 @@ const gameBoard = (function(){
                 getAllTiles()[i].getTile().classList.remove('marked');
             }, delay)
 
-            delay += 100;
+            delay += speed;
         }
     }
-
-    let token = '';
-
-    const setToken = (value) => token = value;
-
-    const getToken = () => token;
 
     const isMoveLegal = function(row, column){
         return gameBoardArray[row][column].getToken() === '';
@@ -93,16 +94,10 @@ const gameBoard = (function(){
 
     }
 
-    let winningTiles = [];
-
-    const getWinningTiles = () => winningTiles;
-
     const validateMove = function(){
 
         let isWinningMove = false;
         
-        
-
         // 1) check rows for winner
         gameBoardArray.forEach((row) => {
             if(row[0].getToken()!== '') {
@@ -114,23 +109,18 @@ const gameBoard = (function(){
         })
 
         // 2) check columns for winner
-        for(let i = 0; i < gameBoardArray.length; i ++){
-            let column = [];
-            
-            gameBoardArray.forEach((row)=>{
-                column.push(row[i]);
-            })
+        getColumns().forEach((column) => {
             if(column[0].getToken() !== '') {
                 if(allEqual(column)) {
                     isWinningMove = true;
                     winningTiles = column;
                 }
             }
-        }
+        })
 
         // // 3) check diagonals for winner
-        const firstDiagonal = [gameBoardArray[0][0], gameBoardArray[1][1], gameBoardArray[2][2]];
-        const secondDiagonal = [gameBoardArray[0][2], gameBoardArray[1][1], gameBoardArray[2][0]];
+        const firstDiagonal = getDiagonals()[0];
+        const secondDiagonal = getDiagonals()[1];
         
         if (firstDiagonal[1].getToken() !== ''){
             if(allEqual(firstDiagonal)) {
@@ -142,13 +132,11 @@ const gameBoard = (function(){
                 winningTiles = secondDiagonal;
             }
         }
-
         return isWinningMove;
     }
-
     return { getGameBoard,getGameBoardContainer, resetBoard, resetBoardWave, isMoveLegal, 
-        makeMove, validateMove, getNumberOfTiles, setToken, 
-        getToken, addTileToGameBoard, getWinningTiles, getAllTiles, lockTiles, unlockTiles, getColumns, getDiagonals}
+             makeMove, validateMove, setToken, getToken, addTileToGameBoard, getWinningTiles, 
+             getAllTiles, lockTiles, unlockTiles, getColumns, getDiagonals}
 })();
 
 const displayController = (function(){
@@ -182,7 +170,6 @@ const displayController = (function(){
                 else {
                     gameBoard.getGameBoard()[row][i].setValue(messageArray[index]);
                 }
-
                 index ++;
             }
         }
@@ -199,8 +186,9 @@ const displayController = (function(){
 
 const gameLoop = (function(){
 
-    const MAX_NUMBER_OF_TURNS = gameBoard.getNumberOfTiles();
+    const MAX_NUMBER_OF_TURNS = gameBoard.getAllTiles().length;
     const ANIMATION_DURATION_IN_MS = 500;
+    const COMPUTER_MOVE_DELAY_IN_MS = 500;
     let numberOfTurns = 0;
     let whoseTurn = 1;
     let player = {};
@@ -212,29 +200,25 @@ const gameLoop = (function(){
         player = createPlayer('cross');
         computer = createComputer('circle');
 
-        // 1 = player's turn.
-        // 0 = computer's turn.
+        // 1 = player's turn, 0 = computer's turn.
         whoseTurn = 1;
         lastToBegin = 1;
 
-        //Show welcome message, and after 2 seconds, start the game.
+        //Show welcome message, and after a delay, start the game.
+        //lock tiles to make them non clickable
+        let delay = 1000;
         gameBoard.lockTiles();
         displayController.renderMessage(['T','I','C','T','A','C','T','O','E']);
-        setTimeout(()=>{
-            // displayController.renderMessage([''], true);
-            gameBoard.resetBoardWave();
-        }, 1000)
-        setTimeout(gameBoard.unlockTiles,1500);
-
-        setTimeout(nextTurn, 1000 + ANIMATION_DURATION_IN_MS);
+        setTimeout(gameBoard.resetBoardWave, delay)
+        setTimeout(gameBoard.unlockTiles,delay + COMPUTER_MOVE_DELAY_IN_MS);
+        setTimeout(nextTurn, delay + ANIMATION_DURATION_IN_MS);
     }
 
-    const newGame = function(displayScore){
-
+    const newGame = function(shouldDisplayScore){
         let delay = 0;
-        displayScore ? delay = 3000 : delay = 1900; 
+        shouldDisplayScore ? delay = 3000 : delay = 1900; 
 
-        if(displayScore){
+        if(shouldDisplayScore){
             //Display score (after delay)
             setTimeout(()=>{
                 displayController.renderScore(player.getScore(),computer.getScore());
@@ -256,26 +240,21 @@ const gameLoop = (function(){
         }
 
         setTimeout(nextTurn, delay);
-
     }
 
     const nextTurn = function() {
-
         //check for wins
         if(gameBoard.validateMove()) {
             setTimeout(()=>{
                 win(gameBoard.validateMove());
             }, 500);
             
-            return
+            return;
         }
         //check for ties
         if(numberOfTurns === MAX_NUMBER_OF_TURNS) {
-            setTimeout(()=>{
-                tie();
-            }, 1000);
-            
-            return
+            setTimeout(tie, 1000);
+            return;
         }
 
         numberOfTurns ++;
@@ -292,7 +271,7 @@ const gameLoop = (function(){
     }
 
     const makeComputerMove = function() {
-        setTimeout(computer.calculateMove, 500);     
+        setTimeout(computer.calculateMove, COMPUTER_MOVE_DELAY_IN_MS);     
     }
 
     const win = function() {
@@ -301,7 +280,7 @@ const gameLoop = (function(){
 
         whoseTurn ? computer.increaseScore() : player.increaseScore();
 
-        //lock winning tiles for editing 
+        //lock winning tiles for editing (note, this is different from lockTiles(), which locks tiles from being clickable)
         gameBoard.getWinningTiles().forEach((e)=>{
             e.getTile().classList.add('locked');
         });
@@ -343,7 +322,7 @@ function createTile(row, column){
     edge.classList.add('edge');
     container.appendChild(edge);
 
-    //Shadow element 
+    //Drop shadow element 
     const shadow = document.createElement('div');
     shadow.classList.add('shadow');
     container.appendChild(shadow);
@@ -354,10 +333,10 @@ function createTile(row, column){
     const setToken = function(newToken) {
         flip();
         token = newToken;
+        //updates the tile token when the tiles are mid animation, ie. when the text is not visible.
         setTimeout(()=>{
             if(token === '') removeToken();
             else tile.classList.add(token);
-
         }, gameLoop.getAnimationDurationInMs() / 2)
     } 
 
@@ -377,9 +356,10 @@ function createTile(row, column){
 
     const setValueWithFlip = function(value){
         flip();
+        //updates the tile text when the tiles are mid animation, ie. when the text is not visible.
         setTimeout(()=>{
             tile.textContent = value;
-        }, gameLoop.getAnimationDurationInMs() / 2);
+        }, gameLoop.getAnimationDurationInMs() / 2 );
     }
 
     const flip = function() {
@@ -396,10 +376,8 @@ function createTile(row, column){
         if(gameBoard.isMoveLegal(row, column)) {
             gameBoard.makeMove(row, column);
             gameLoop.nextTurn();
-            tile.classList.remove('cursor');
             gameBoard.lockTiles();
         }
-       
     });    
 
     return { getTile, getRow, getColumn, getValue, setValue, getContainer, setValueWithFlip, setToken, getToken }
@@ -419,20 +397,16 @@ function createPlayer(token){
 function createComputer(token){
     const { getToken, getScore, increaseScore  } = createPlayer(token);
 
-    let tokensFound = 0;
-    let firstToken = '';
-    let isEnemyToken = false;
-    let winningStreakFound = false;
-    let streak = [];
-    let lastStreak = [];
-    let currentStreakSearch = [];
     
+    let tokensFound = 0; //used for scanning after 2 or more tokens in a row
+    let firstToken = '';
+    let winningStreakFound = false;
+    let streak = []; // a streak refers to either a row, a column or a diagonal.
+    let currentStreakSearch = [];
 
     const calculateMove = function(){
 
         const gameBoardArray = gameBoard.getGameBoard();
-
-        let computerMove = {};
 
          // 1) Always aim for the center in the beginning.
         if(tryMoveCenter(gameBoardArray)) return;
@@ -445,14 +419,12 @@ function createComputer(token){
 
         // 3) Check for row, column or diagonal with 2 of same kind and with an empty slot.
         // Every now and then, make a random move instead.
-
         if (getRandomInt(6) > 5) {
             makeRandomMove(gameBoardArray);
-            return
+            return;
         }
 
-        checkStreaks(gameBoardArray);
-
+        checkStreaks(gameBoardArray); //updates 'streak' if appropriate streak is found
         if(streak.length > 0) {
             makeMoveInEmptySpot(streak);
             return;
@@ -460,7 +432,6 @@ function createComputer(token){
 
         // If all else fails, make random move.
         makeRandomMove(gameBoardArray);
-
     }
 
     const containtsEmptySlot = (streak) => {
@@ -468,7 +439,6 @@ function createComputer(token){
         streak.forEach((tile) => {
             if(tile.getToken() === '') hasEmptySlot = true;
         })
-
         return hasEmptySlot;
     }
 
@@ -484,6 +454,8 @@ function createComputer(token){
     }
 
     const search = function (tile){
+        let isEnemyToken = false;
+
         if(tile.getToken() !== '') { 
             tokensFound ++;
             // Set first token, if not already set
@@ -555,6 +527,9 @@ function createComputer(token){
     }
 
     const scanDiagonals = (board, func) => {
+        tokensFound = 0;
+        firstToken = '';
+
         for(let i = 0; i < 2; i ++){
             currentStreakSearch = [];
             currentStreakSearch = gameBoard.getDiagonals()[i];
