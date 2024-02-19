@@ -19,6 +19,26 @@ const gameBoard = (function(){
         return allTiles;
     }
 
+    const getColumns = () => {
+        let columns = [];
+        for(let i = 0; i < gameBoardArray.length; i ++){
+            let column = [];
+            gameBoardArray.forEach((row)=>{
+                column.push(row[i]);
+            })
+            columns.push(column);
+        }
+        return columns;
+    }
+
+    const getDiagonals = () => {
+        let diagonals = [];
+        const firstDiagonal = [gameBoardArray[0][0], gameBoardArray[1][1], gameBoardArray[2][2]];
+        const secondDiagonal = [gameBoardArray[0][2], gameBoardArray[1][1], gameBoardArray[2][0]];
+        diagonals.push(firstDiagonal, secondDiagonal);
+        return diagonals;
+    }
+
     const getGameBoardContainer = () => document.querySelector('.js-gameboard-container');
 
     const getNumberOfTiles = () => Math.pow(gameBoardArray.length, 2);
@@ -128,7 +148,7 @@ const gameBoard = (function(){
 
     return { getGameBoard,getGameBoardContainer, resetBoard, resetBoardWave, isMoveLegal, 
         makeMove, validateMove, getNumberOfTiles, setToken, 
-        getToken, addTileToGameBoard, getWinningTiles, getAllTiles, lockTiles, unlockTiles}
+        getToken, addTileToGameBoard, getWinningTiles, getAllTiles, lockTiles, unlockTiles, getColumns, getDiagonals}
 })();
 
 const displayController = (function(){
@@ -203,7 +223,7 @@ const gameLoop = (function(){
         setTimeout(()=>{
             // displayController.renderMessage([''], true);
             gameBoard.resetBoardWave();
-        }, 100)
+        }, 1000)
         setTimeout(gameBoard.unlockTiles,1500);
 
         setTimeout(nextTurn, 1000 + ANIMATION_DURATION_IN_MS);
@@ -399,22 +419,177 @@ function createPlayer(token){
 function createComputer(token){
     const { getToken, getScore, increaseScore  } = createPlayer(token);
 
+    let tokensFound = 0;
+    let firstToken = '';
+    let isEnemyToken = false;
+    let winningStreakFound = false;
+    let streak = [];
+    let lastStreak = [];
+    let currentStreakSearch = [];
+    
+
     const calculateMove = function(){
+
+        const gameBoardArray = gameBoard.getGameBoard();
 
         let computerMove = {};
 
          // 1) Always aim for the center in the beginning.
-         if(gameBoard.getGameBoard()[1][1].getToken() === '') {
-            gameBoard.makeMove(1, 1);
-            gameLoop.nextTurn();
+        if(tryMoveCenter(gameBoardArray)) return;
+
+        // 2) If center is taken and surrounding squares are empty, make a random move.
+        if(surroundingSquaresEmpty()) {
+            makeRandomMove(gameBoardArray);
             return;
         }
 
-        // 2) If center is taken, make a random move.
+        // 3) Check for row, column or diagonal with 2 of same kind and with an empty slot.
+        // Every now and then, make a random move instead.
 
+        if (getRandomInt(6) > 5) {
+            makeRandomMove(gameBoardArray);
+            return
+        }
+
+        checkStreaks(gameBoardArray);
+
+        if(streak.length > 0) {
+            makeMoveInEmptySpot(streak);
+            return;
+        }
+
+        // If all else fails, make random move.
+        makeRandomMove(gameBoardArray);
+
+    }
+
+    const containtsEmptySlot = (streak) => {
+        let hasEmptySlot = false;
+        streak.forEach((tile) => {
+            if(tile.getToken() === '') hasEmptySlot = true;
+        })
+
+        return hasEmptySlot;
+    }
+
+    const makeMoveInEmptySpot = (streak) => {
+       
+        streak.forEach((tile) => {
+    
+            if(tile.getToken() === '') {
+                gameBoard.makeMove(tile.getRow(), tile.getColumn());
+                gameLoop.nextTurn();
+            }
+        })
+    }
+
+    const search = function (tile){
+        if(tile.getToken() !== '') { 
+            tokensFound ++;
+            // Set first token, if not already set
+            if(firstToken === '') firstToken = tile.getToken();
+        }
+        if(tokensFound === 2 && firstToken === tile.getToken()) {
+            
+            if(firstToken !== token) isEnemyToken = true;
+
+            if(!isEnemyToken) { 
+                streak = currentStreakSearch;
+                winningStreakFound = true;
+            }
+
+            // Only set enemy streak if there is no streak with own token
+            if(isEnemyToken && streak.length === 0) {
+                streak = currentStreakSearch;
+            }
+        }
+    }
+
+
+    const checkStreaks = (board) => {
+
+        scanRows(board, search);
+
+        if(!winningStreakFound) scanColumns(board, search);
+
+        if(!winningStreakFound) scanDiagonals(board, search);
+
+        return streak;
+    }
+
+    const scanRows = (board, func) => {
+        streak = [];
+        tokensFound = 0;
+        firstToken = '';
+
+        for(let row = 0; row < 3; row ++){
+            
+            currentStreakSearch = board[row];
+
+            if (!containtsEmptySlot(currentStreakSearch)) continue;
+
+            board[row].forEach((tile) => { func(tile) })
+            tokensFound = 0;
+            firstToken = '';
+        }
+    }
+
+    const scanColumns = (board, func) => {
+        tokensFound = 0;
+        firstToken = '';
+
+        const columns = gameBoard.getColumns();
+        
+        for(let column = 0; column < 3; column ++){
+
+            currentStreakSearch = columns[column];
+
+            if (!containtsEmptySlot(currentStreakSearch)) {
+                continue;}
+
+
+            columns[column].forEach((tile) => { func(tile) })
+            tokensFound = 0;
+            firstToken = '';
+        }
+    }
+
+    const scanDiagonals = (board, func) => {
+        for(let i = 0; i < 2; i ++){
+            currentStreakSearch = [];
+            currentStreakSearch = gameBoard.getDiagonals()[i];
+
+            if (!containtsEmptySlot(currentStreakSearch)) continue;
+
+            gameBoard.getDiagonals()[i].forEach((tile) => { func(tile) })
+            tokensFound = 0;
+            firstToken = '';
+        }
+    }
+
+    const surroundingSquaresEmpty = () => {
+        let squaresEmpty = true;
+
+        gameBoard.getAllTiles().forEach((tile) => {
+            if(tile.getRow() === 1 && tile.getColumn() === 1) return;
+            if(tile.getToken() !== '') squaresEmpty = false;
+        });
+        return squaresEmpty;
+    }
+
+    const tryMoveCenter = (board) => {
+        if(board[1][1].getToken() === '') {
+            gameBoard.makeMove(1, 1);
+            gameLoop.nextTurn();
+            return true;
+        }
+        return false;
+    }
+
+    const makeRandomMove = (board) => {
         const generateNewMove = function(){
-            const row = getRandomInt(gameBoard.getGameBoard().length);
-            const column = getRandomInt(gameBoard.getGameBoard().length);
+            const row = getRandomInt(board.length);
+            const column = getRandomInt(board.length);
             const isLegalMove = gameBoard.isMoveLegal(row, column);
             return { row, column, isLegalMove} 
         }
@@ -428,7 +603,7 @@ function createComputer(token){
     }
 
     return{ calculateMove, getToken, getScore, increaseScore }
-g
+
 }
 
 function getRandomInt(max) {
