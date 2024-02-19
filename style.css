@@ -148,25 +148,9 @@ a:hover{
 }
 
 @keyframes shadow-flip {
-    0%{
-
-      
-    }
-
     50%{
         translate: -10px 90px;
         scale: 100% 110%;
-    }
-
-    /* 70%{
-        translate: -40px 80px;
-        scale: 100% 120%;
-   
-    } */
-
-    100%{
-  
-
     }
 }
 
@@ -188,8 +172,7 @@ a:hover{
     }
 
     88%{
-        top:0%;
-        
+        top:0%;   
     }
 
     100%{
