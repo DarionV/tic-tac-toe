@@ -1,255 +1,249 @@
-*{
-    padding: 0;
-    margin: 0;
+* {
+  padding: 0;
+  margin: 0;
 }
 
-body{
-    height: 100vh;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: #84A4B1;
+body {
+  height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #84a4b1;
 }
 
-header{
-    height: 40px;
-    width: 100vw;
-    display: flex;
-    justify-content: end;
+header {
+  height: 40px;
+  width: 100vw;
+  display: flex;
+  justify-content: end;
 }
 
-.mute-button{
-    height: 38px;
-    width: 38px;
-    background-color: unset;
-    border: none;
-    margin-top: 12px;
-    margin-right: 24px;
-    background-image: url(images/volume_on.svg);
-    background-repeat: no-repeat;
-    background-size: cover;
-    opacity: 50%;
-    cursor: pointer;
+.mute-button {
+  height: 38px;
+  width: 38px;
+  background-color: unset;
+  border: none;
+  margin-top: 12px;
+  margin-right: 24px;
+  background-image: url(images/volume_on.svg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 50%;
+  cursor: pointer;
 }
 
-.mute-button.off{
-    background-image: url(images/volume_off.svg);
+.mute-button.off {
+  background-image: url(images/volume_off.svg);
 }
 
-.content{
-    width: 100vw;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
+.content {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 
-footer{
-    margin-top: auto;
-    width: 100vw;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: top;
-    font-family: "Inter", sans-serif;
-    font-size: 16px;
+footer {
+  margin-top: auto;
+  width: 100vw;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: top;
+  font-family: "Inter", sans-serif;
+  font-size: 16px;
 }
 
-a{
-    text-decoration: none;
-    color: #E5E5E5
+a {
+  text-decoration: none;
+  color: #e5e5e5;
 }
-a:hover{
-    color: white;
-}
-
-.gameboard-container{
-    width: 500px;
-    height: 500px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
-    gap: 24px;
-    z-index: 2;
+a:hover {
+  color: white;
 }
 
-.tile-container{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    font-family: "Fredoka", sans-serif;
-    font-size: 80px;
-    font-weight: 600;
-    font-style: normal;
-    color: rgba(83, 83, 83, 0.8);
-    text-shadow: 1px 4px 6px rgb(251, 251, 251), 0 0 0 #000, 1px 4px 6px rgb(255, 255, 255);
+.gameboard-container {
+  width: 500px;
+  height: 500px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 24px;
+  z-index: 2;
 }
 
-
+.tile-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  font-family: "Fredoka", sans-serif;
+  font-size: 80px;
+  font-weight: 600;
+  font-style: normal;
+  color: rgba(83, 83, 83, 0.8);
+  text-shadow: 1px 4px 6px rgb(251, 251, 251), 0 0 0 #000,
+    1px 4px 6px rgb(255, 255, 255);
+}
 
 .tile {
-    background-color: #EFEFEF;
-    border-radius: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    user-select: none;
-    cursor: pointer;
-    height: 100%;
-    width: 100%;
-    z-index: 3;
-    transition-property: transform;
-    transition-duration: 0.2s;
-    -webkit-tap-highlight-color: transparent;
+  background-color: #efefef;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+  cursor: pointer;
+  height: 100%;
+  width: 100%;
+  z-index: 3;
+  transition-property: transform;
+  transition-duration: 0.2s;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.tile:hover:not(.non-clickable, .marked){
-    transform: rotateX(15deg);
+.tile:hover:not(.non-clickable, .marked) {
+  transform: rotateX(15deg);
 }
 
-.edge{
-    background-color: #c2c2c2;
-    width: 100%;
-    height: 20%;
-    position: absolute;
-    z-index: 2;
-    transition-property: all;
-    transition-duration: 0.1s;
-    border-radius: 12px;
-} 
+.edge {
+  background-color: #c2c2c2;
+  width: 100%;
+  height: 20%;
+  position: absolute;
+  z-index: 2;
+  transition-property: all;
+  transition-duration: 0.1s;
+  border-radius: 12px;
+}
 
-.tile:hover:not(.non-clickable, .marked)~ .edge{
-    top: 123px;
+.tile:hover:not(.non-clickable, .marked) ~ .edge {
+  top: 123px;
 }
 
 .cross {
-    background-image: url(images/cross.svg);
-    background-repeat: no-repeat;
-    background-size: 50%;
-    background-position: 48% 52%;
+  background-image: url(images/cross.svg);
+  background-repeat: no-repeat;
+  background-size: 50%;
+  background-position: 48% 52%;
 }
 
 .circle {
-    background-image: url(images/circle.svg);
-    background-repeat: no-repeat;
-    background-size: 60%;
-    background-position: 48% 52%;
+  background-image: url(images/circle.svg);
+  background-repeat: no-repeat;
+  background-size: 60%;
+  background-position: 48% 52%;
 }
 
 .shadow {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    background-color: #637B85;
-    top: 8px;
-    left: -8px;
-    border-radius: 12px;
-    z-index: 1;
-    transition-property: all;
-    transition-duration: 0.2s;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background-color: #637b85;
+  top: 8px;
+  left: -8px;
+  border-radius: 12px;
+  z-index: 1;
+  transition-property: all;
+  transition-duration: 0.2s;
 }
 
-.tile:hover:not(.non-clickable, .marked)~ .shadow{
-    top: 12px;
+.tile:hover:not(.non-clickable, .marked) ~ .shadow {
+  top: 12px;
 }
 
-.non-clickable, .marked{
-    cursor: default;
+.non-clickable,
+.marked {
+  cursor: default;
 }
 
-.tile-container.flip>.tile{
-    animation: flip 0.5s linear;
+.tile-container.flip > .tile {
+  animation: flip 0.5s linear;
 }
 
-.tile-container.flip>.edge{
-    animation: edge-flip 0.5s linear;
+.tile-container.flip > .edge {
+  animation: edge-flip 0.5s linear;
 }
 
-.tile-container.flip>.shadow{
-    animation: shadow-flip 0.5s linear;
+.tile-container.flip > .shadow {
+  animation: shadow-flip 0.5s linear;
 }
 
-img{
-    margin-left: 4px;
-    translate: 0px 3px;
+img {
+  margin-left: 4px;
+  translate: 0px 3px;
 }
 
 @keyframes shadow-flip {
-    50%{
-        translate: -10px 90px;
-        scale: 100% 110%;
-    }
+  50% {
+    translate: -10px 90px;
+    scale: 100% 110%;
+  }
 }
 
 @keyframes edge-flip {
-    0%{
-        background-color: #c2c2c2;
-        top: 80%;
-        border-radius: 12px;
-    }
+  0% {
+    background-color: #c2c2c2;
+    top: 80%;
+    border-radius: 12px;
+  }
 
-    23%{
-        top: 80%;
-    }
+  23% {
+    top: 80%;
+  }
 
-    50%{
-        top: 50%;
-        border-radius: 0px;
-        background-color: #ffffff;
-    }
+  50% {
+    top: 50%;
+    border-radius: 0px;
+    background-color: #ffffff;
+  }
 
-    88%{
-        top:0%;   
-    }
+  88% {
+    top: 0%;
+  }
 
-    100%{
-        border-radius: 12px;
-        top:0%;
-        background-color: #ffffff;
-    }
+  100% {
+    border-radius: 12px;
+    top: 0%;
+    background-color: #ffffff;
+  }
 }
 
-
-
 @keyframes flip {
-    0% {
-        transform: rotateX(0deg);
-        background-color: #EFEFEF;
-    }
+  0% {
+    transform: rotateX(0deg);
+    background-color: #efefef;
+  }
 
-    50% {
-        transform: rotateX(90deg);
-        translate: 0px 0px;
-        background-color: #ffffff;
-    }
-    51%{
-        translate: 0px 30px;
-        background-color: #ffffff;
-        
-    }
-    52%{
-        background-color: #c2c2c2;
-    }
+  50% {
+    transform: rotateX(90deg);
+    translate: 0px 0px;
+    background-color: #ffffff;
+  }
+  51% {
+    translate: 0px 30px;
+    background-color: #ffffff;
+  }
+  52% {
+    background-color: #c2c2c2;
+  }
 
-    100% {
-        transform: rotateX(0deg);
-        background-color: #EFEFEF;
-    }
+  100% {
+    transform: rotateX(0deg);
+    background-color: #efefef;
+  }
 }
 
 @media screen and (max-width: 600px) {
-    .gameboard-container{
-        margin: 16px;
-        gap: 16px;
+  .gameboard-container {
+    margin: 16px;
+    gap: 16px;
   }
 
-  body{ 
+  body {
     height: 100dvh;
   }
 }
-
-
-
