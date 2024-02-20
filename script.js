@@ -469,7 +469,7 @@ function createComputer(token){
 
         // 3) Check for row, column or diagonal with 2 of same kind and with an empty slot.
         // Every now and then, make a random move instead.
-        if (getRandomInt(6) > 5) {
+        if (getRandomInt(6) > 4) {
             makeRandomMove(gameBoardArray);
             return;
         }
