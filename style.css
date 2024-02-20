@@ -147,6 +147,11 @@ a:hover{
     animation: shadow-flip 0.5s linear;
 }
 
+img{
+    margin-left: 4px;
+    translate: 0px 3px;
+}
+
 @keyframes shadow-flip {
     50%{
         translate: -10px 90px;

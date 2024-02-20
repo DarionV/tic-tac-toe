@@ -284,7 +284,7 @@ const gameLoop = (function(){
         gameBoard.getWinningTiles().forEach((e)=>{
             e.getTile().classList.add('locked');
         });
-        //edit the losing tiles and then unlock all
+        //hide the losing tiles and then unlock all
         gameBoard.getGameBoard().forEach((row)=>{
             row.forEach((e)=>{
                 if(!e.getTile().classList.contains('locked') && e.getToken() !==''){
@@ -294,7 +294,9 @@ const gameLoop = (function(){
             })
         })
 
-        newGame(true);
+        setTimeout(()=>{
+            newGame(true);
+        }, 500)
     }
 
     const tie = function(){
@@ -337,7 +339,7 @@ function createTile(row, column){
         setTimeout(()=>{
             if(token === '') removeToken();
             else tile.classList.add(token);
-        }, gameLoop.getAnimationDurationInMs() / 2)
+        }, gameLoop.getAnimationDurationInMs() / 1.9)
     } 
 
     const removeToken = function(){
