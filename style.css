@@ -13,6 +13,31 @@ body{
     background-color: #84A4B1;
 }
 
+header{
+    height: 40px;
+    width: 100vw;
+    display: flex;
+    justify-content: end;
+}
+
+.mute-button{
+    height: 38px;
+    width: 38px;
+    background-color: unset;
+    border: none;
+    margin-top: 12px;
+    margin-right: 24px;
+    background-image: url(images/volume_on.svg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity: 50%;
+    cursor: pointer;
+}
+
+.mute-button.off{
+    background-image: url(images/volume_off.svg);
+}
+
 .content{
     width: 100vw;
     display: flex;

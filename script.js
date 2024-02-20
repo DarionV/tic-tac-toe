@@ -140,11 +140,26 @@ const gameBoard = (function(){
 })();
 
 const soundController = (function(){
+    let isVolumeOn = true;
+    const muteButton = document.querySelector('.mute-button');
+
+    const toggleVolume = () => {
+        if(isVolumeOn){
+            isVolumeOn = false;
+            muteButton.classList.add('off')
+        } else {
+            isVolumeOn = true;
+            muteButton.classList.remove('off')
+        }
+    }
+
+    muteButton.addEventListener('click', toggleVolume);
 
     const audio_win = new Audio ('audio/win.m4a');
     audio_win.volume = 0.1;
     
     const flip = () => {
+        if(!isVolumeOn) return;
         const audio_tileFlip = new Audio ('audio/chip.mp3')
         audio_tileFlip.volume = 0.1;
         audio_tileFlip.play();
@@ -152,6 +167,7 @@ const soundController = (function(){
     }
 
     const win = () => {
+        if(!isVolumeOn) return;
         audio_win.play();
     }
 
