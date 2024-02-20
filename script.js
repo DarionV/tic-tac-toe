@@ -140,15 +140,22 @@ const gameBoard = (function(){
 })();
 
 const soundController = (function(){
+
+    const audio_win = new Audio ('audio/win.m4a');
+    audio_win.volume = 0.1;
     
     const flip = () => {
         const audio_tileFlip = new Audio ('audio/chip.mp3')
-        audio_tileFlip.volume = 0.5;
+        audio_tileFlip.volume = 0.1;
         audio_tileFlip.play();
         setTimeout(audio_tileFlip.destroy, 1000);
     }
 
-    return { flip }
+    const win = () => {
+        audio_win.play();
+    }
+
+    return { flip, win }
 })();
 
 const displayController = (function(){
@@ -271,7 +278,12 @@ const gameLoop = (function(){
 
         gameBoard.lockTiles();
 
-        whoseTurn ? computer.increaseScore() : player.increaseScore();
+        if(whoseTurn) {
+            computer.increaseScore();
+        } else {
+            player.increaseScore();
+            soundController.win();
+        }
 
         //lock winning tiles for editing (note, this is different from lockTiles(), which locks tiles from being clickable)
         gameBoard.getWinningTiles().forEach((e)=>{
