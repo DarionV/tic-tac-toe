@@ -1,8 +1,6 @@
 const gameBoard = (function(){
     let gameBoardArray = [["","",""],["","",""],["","",""]];
-
-    let winningTiles = [];
-
+    let winningTiles = []; //used to hide all other tiles after win
     let token = '';
 
     const getWinningTiles = () => winningTiles;
@@ -58,7 +56,7 @@ const gameBoard = (function(){
             })
     }
 
-    const resetBoardWave = function(speed = 100){
+    const resetBoardWithWaveAnimation = function(speed = 100){
         let delay = 100;
 
         for(let i = 0; i < getAllTiles().length; i++){
@@ -134,7 +132,7 @@ const gameBoard = (function(){
         }
         return isWinningMove;
     }
-    return { getGameBoard,getGameBoardContainer, resetBoard, resetBoardWave, isMoveLegal, 
+    return { getGameBoard,getGameBoardContainer, resetBoard, resetBoardWithWaveAnimation, isMoveLegal, 
              makeMove, validateMove, setToken, getToken, addTileToGameBoard, getWinningTiles, 
              getAllTiles, lockTiles, unlockTiles, getColumns, getDiagonals}
 })();
@@ -209,8 +207,8 @@ const gameLoop = (function(){
         let delay = 1000;
         gameBoard.lockTiles();
         displayController.renderMessage(['T','I','C','T','A','C','T','O','E']);
-        setTimeout(gameBoard.resetBoardWave, delay)
-        setTimeout(gameBoard.unlockTiles,delay + COMPUTER_MOVE_DELAY_IN_MS);
+        setTimeout(gameBoard.resetBoardWithWaveAnimation, delay)
+        setTimeout(gameBoard.unlockTiles, delay + COMPUTER_MOVE_DELAY_IN_MS);
         setTimeout(nextTurn, delay + ANIMATION_DURATION_IN_MS);
     }
 
@@ -219,25 +217,17 @@ const gameLoop = (function(){
         shouldDisplayScore ? delay = 3000 : delay = 1900; 
 
         if(shouldDisplayScore){
-            //Display score (after delay)
             setTimeout(()=>{
                 displayController.renderScore(player.getScore(),computer.getScore());
             }, 1000);
         }
 
-         //Reset game board (after delay)
+         //Reset game board
          setTimeout(gameBoard.resetBoard, delay - 500);
 
         numberOfTurns = 0;
         
-        //Decide who will go first
-        if(lastToBegin) {
-            whoseTurn = 0;
-            lastToBegin = 0;
-        } else {
-            whoseTurn = 1;
-            lastToBegin = 1;
-        }
+        switchBeginningTurns();
 
         setTimeout(nextTurn, delay);
     }
@@ -248,7 +238,6 @@ const gameLoop = (function(){
             setTimeout(()=>{
                 win(gameBoard.validateMove());
             }, 500);
-            
             return;
         }
         //check for ties
@@ -258,20 +247,7 @@ const gameLoop = (function(){
         }
 
         numberOfTurns ++;
-
-        if(whoseTurn) { 
-            whoseTurn = 0;
-            gameBoard.setToken(player.getToken());
-            gameBoard.unlockTiles();
-        } else {
-            whoseTurn = 1;
-            gameBoard.setToken(computer.getToken());
-            makeComputerMove();
-        }
-    }
-
-    const makeComputerMove = function() {
-        setTimeout(computer.calculateMove, COMPUTER_MOVE_DELAY_IN_MS);     
+        switchTurns();
     }
 
     const win = function() {
@@ -297,11 +273,38 @@ const gameLoop = (function(){
         setTimeout(()=>{
             newGame(true);
         }, 500)
+
     }
 
     const tie = function(){
         displayController.renderMessage(['','','','T','I','E','','',''], true);
         newGame(false);
+    }
+
+    const makeComputerMove = function() {
+        setTimeout(computer.calculateMove, COMPUTER_MOVE_DELAY_IN_MS);     
+    }
+
+    const switchBeginningTurns = () => {
+        if(lastToBegin) {
+            whoseTurn = 0;
+            lastToBegin = 0;
+        } else {
+            whoseTurn = 1;
+            lastToBegin = 1;
+        }
+    }
+
+    const switchTurns = () => {
+        if(whoseTurn) { 
+            whoseTurn = 0;
+            gameBoard.setToken(player.getToken());
+            gameBoard.unlockTiles();
+        } else {
+            whoseTurn = 1;
+            gameBoard.setToken(computer.getToken());
+            makeComputerMove();
+        }
     }
     
     initializeGame();
@@ -432,7 +435,7 @@ function createComputer(token){
             return;
         }
 
-        // If all else fails, make random move.
+        // 4) If all else fails, make random move.
         makeRandomMove(gameBoardArray);
     }
 
