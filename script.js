@@ -49,6 +49,7 @@ const gameBoard = (function(){
     const getGameBoardContainer = () => document.querySelector('.js-gameboard-container');
 
     const resetBoard = function() {
+        soundController.flip();
         getAllTiles().forEach((tile)=>{
                 if(tile.getValue() !== '')tile.setValueWithFlip('');
                 if(tile.getToken() !== '')tile.setToken('');
@@ -87,6 +88,7 @@ const gameBoard = (function(){
     }
 
     const makeMove = function(row, column){
+        soundController.flip();
         gameBoardArray[row][column].getTile().classList.add('marked');
         gameBoardArray[row][column].setToken(token);
 
@@ -135,6 +137,18 @@ const gameBoard = (function(){
     return { getGameBoard,getGameBoardContainer, resetBoard, resetBoardWithWaveAnimation, isMoveLegal, 
              makeMove, validateMove, setToken, getToken, addTileToGameBoard, getWinningTiles, 
              getAllTiles, lockTiles, unlockTiles, getColumns, getDiagonals}
+})();
+
+const soundController = (function(){
+    
+    const flip = () => {
+        const audio_tileFlip = new Audio ('audio/chip.mp3')
+        audio_tileFlip.volume = 0.5;
+        audio_tileFlip.play();
+        setTimeout(audio_tileFlip.destroy, 1000);
+    }
+
+    return { flip }
 })();
 
 const displayController = (function(){
@@ -218,6 +232,7 @@ const gameLoop = (function(){
 
         if(shouldDisplayScore){
             setTimeout(()=>{
+                soundController.flip();
                 displayController.renderScore(player.getScore(),computer.getScore());
             }, 1000);
         }
@@ -252,6 +267,8 @@ const gameLoop = (function(){
 
     const win = function() {
 
+        soundController.flip();
+
         gameBoard.lockTiles();
 
         whoseTurn ? computer.increaseScore() : player.increaseScore();
@@ -277,6 +294,7 @@ const gameLoop = (function(){
     }
 
     const tie = function(){
+        soundController.flip();
         displayController.renderMessage(['','','','T','I','E','','',''], true);
         newGame(false);
     }
@@ -375,7 +393,6 @@ function createTile(row, column){
     }
 
     tile.addEventListener('click', ()=>{
-
         if(tile.classList.contains('non-clickable')) return;
 
         if(gameBoard.isMoveLegal(row, column)) {
