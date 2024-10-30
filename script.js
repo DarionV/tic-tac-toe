@@ -202,6 +202,11 @@ const soundController = (function () {
 })();
 
 const displayController = (function () {
+  const preloadImage01 = new Image();
+  const preloadImage02 = new Image();
+  preloadImage01.src = "images/cross.svg";
+  preloadImage02.src = "images/circle.svg";
+
   const createTiles = (function () {
     const container = gameBoard.getGameBoardContainer();
     const gameBoardLength = gameBoard.getGameBoard().length;
