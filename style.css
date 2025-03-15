@@ -116,12 +116,13 @@ a:hover {
   position: absolute;
   z-index: 2;
   transition-property: all;
-  transition-duration: 0.1s;
+  transition-duration: 0.2s;
   border-radius: 12px;
+  top: 115px;
 }
 
 .tile:hover:not(.non-clickable, .marked) ~ .edge {
-  top: 123px;
+  transform: translateY(10px);
 }
 
 .cross {
@@ -187,16 +188,16 @@ img {
 @keyframes edge-flip {
   0% {
     background-color: #c2c2c2;
-    top: 80%;
+    transform: translateY(10px);
     border-radius: 12px;
   }
 
   23% {
-    top: 80%;
+    transform: translateY(30px);
   }
 
   50% {
-    top: 50%;
+    transform: translateY(25px);
     border-radius: 0px;
     background-color: #ffffff;
   }
@@ -214,7 +215,7 @@ img {
 
 @keyframes flip {
   0% {
-    transform: rotateX(0deg);
+    transform: rotateX(15deg);
     background-color: #efefef;
   }
 
