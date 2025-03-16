@@ -256,7 +256,7 @@ const displayController = (function () {
 
 const gameLoop = (function () {
   const MAX_NUMBER_OF_TURNS = gameBoard.getAllTiles().length;
-  const ANIMATION_DURATION_IN_MS = 500;
+  const ANIMATION_DURATION_IN_MS = 2000;
   const COMPUTER_MOVE_DELAY_IN_MS = 500;
   let numberOfTurns = 0;
   let whoseTurn = 1;
